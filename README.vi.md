@@ -179,7 +179,17 @@ rri-t cho build này                        # chỉ chạy stage adversarial QA
 rri-ux critique màn thanh toán            # chỉ chạy stage critique trước khi code
 ```
 
-Tài liệu tiếng Anh: [`docs/VIBECODEKIT-HYBRID.md`](./docs/VIBECODEKIT-HYBRID.md). Overview locale: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md).
+Phase 3 bổ sung CLI, preset marketplace, ví dụ đầy đủ, auto-detect locale:
+
+- `omc vibecodekit scaffold <slug> [--locale en|vi]` — tạo skeleton `.omc/{research,specs,plans,design,verify}/` + `.omc/deliverables.json`.
+- `omc vibecodekit status` — in release gate hiện tại từ `deliverables.json` (không cần mở Claude).
+- `omc vibecodekit patterns` / `locales` — liệt kê 7 vision pattern và overlay locale.
+- `vibecodekit-hybrid-scan` giờ phát hiện dự án VN-first theo thang tín hiệu xác định (explicit `.omc/locale.json` → `OMC_LOCALE` → `--locale` → heuristic README → heuristic manifest → mặc định `en`), ghi tín hiệu thắng vào scan report và trả locale về orchestrator.
+- Ví dụ đầy đủ tại [`examples/vibecodekit-hybrid/`](./examples/vibecodekit-hybrid/): `landing-vn/` (studio yoga Việt) và `saas-enterprise-module/` (Invoice cho SaaS Việt).
+- Fixture PDF Unicode cho RRI-T tại [`templates/vibecodekit-hybrid/fixtures/pdf-unicode/`](./templates/vibecodekit-hybrid/fixtures/pdf-unicode/).
+- Entry preset marketplace tại [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json) trong `plugins[0].presets[]`.
+
+Tài liệu tiếng Anh: [`docs/VIBECODEKIT-HYBRID.md`](./docs/VIBECODEKIT-HYBRID.md). Migration guide: [`docs/VIBECODEKIT-MIGRATION.md`](./docs/VIBECODEKIT-MIGRATION.md). Overview locale: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md).
 
 ### Điều phối thông minh
 

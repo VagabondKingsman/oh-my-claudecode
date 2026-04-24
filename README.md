@@ -259,7 +259,17 @@ rri-t this build                        # sub-skill routing (adversarial QA only
 rri-ux critique the checkout flow       # sub-skill routing (pre-design UX critique)
 ```
 
-Vietnamese docs: [`locale/vi/VIBECODEKIT-HYBRID.vi.md`](./locale/vi/VIBECODEKIT-HYBRID.vi.md), locale overview: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md).
+Phase 3 adds a thin CLI surface, a marketplace preset entry, worked examples, and locale auto-detection:
+
+- `omc vibecodekit scaffold <slug> [--locale en|vi]` — seed `.omc/{research,specs,plans,design,verify}/` skeleton and `.omc/deliverables.json`.
+- `omc vibecodekit status` — pretty-print the current release gate without opening Claude.
+- `omc vibecodekit patterns` / `locales` — list the 7 vision patterns and the available locale overlays.
+- `vibecodekit-hybrid-scan` now detects Vietnamese projects deterministically (explicit `.omc/locale.json` → `OMC_LOCALE` → `--locale` → README diacritic-density heuristic → `package.json` / `pyproject.toml` / `Cargo.toml` description heuristic → default `en`), records the winning signal in the scan report, and echoes the locale back so all downstream stages inherit it.
+- Worked examples under [`examples/vibecodekit-hybrid/`](./examples/vibecodekit-hybrid/): `landing-vn/` (Vietnamese yoga studio landing) and `saas-enterprise-module/` (invoice module for a VN Enterprise SaaS).
+- PDF-export Unicode fixtures at [`templates/vibecodekit-hybrid/fixtures/pdf-unicode/`](./templates/vibecodekit-hybrid/fixtures/pdf-unicode/) wired into the RRI-T Vietnamese rubric.
+- Marketplace preset entry at [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json) under `plugins[0].presets[]`.
+
+Vietnamese docs: [`locale/vi/VIBECODEKIT-HYBRID.vi.md`](./locale/vi/VIBECODEKIT-HYBRID.vi.md), locale overview: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md), migration guide: [`docs/VIBECODEKIT-MIGRATION.md`](./docs/VIBECODEKIT-MIGRATION.md).
 
 ### Intelligent Orchestration
 

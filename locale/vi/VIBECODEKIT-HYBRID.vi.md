@@ -140,10 +140,52 @@ Các cờ hỗ trợ:
 - Keyword detector bổ sung pattern `rri-t`, `rri-ux`, `rri-ui`, `ui-design-pipeline`, `flow-physics(-critique|-test)?` (orchestrator vẫn có priority cao hơn).
 - Opt-in Vietnamese qua `OMC_LOCALE=vi`: overlay tại `locale/vi/agents/*.vi.md`, `locale/vi/skills/*.vi.md`, `locale/vi/README.vi.md` (12 anti-pattern VN bắt buộc).
 
-## Phase 3 dự kiến
+## Phase 3 đã bàn giao (PR này)
 
-- CLI `omc vibecodekit`, preset marketplace, migration guide, ví dụ đầy đủ.
-- Auto-detect VN-first project từ SCAN, persona bank tiếng Việt sâu hơn, check PDF font Unicode trong fixture RRI-T.
+- **CLI `omc vibecodekit`** (Node/Commander) với 4 subcommand:
+  - `scaffold <slug> [--locale en|vi]` — tạo skeleton `.omc/{research,specs,plans,design,verify}/` + `.omc/deliverables.json`.
+  - `status [<slug>]` — in release gate hiện tại từ `deliverables.json`.
+  - `patterns` — liệt kê 7 vision pattern.
+  - `locales` — liệt kê overlay locale (en + vi).
+- **Preset marketplace**: `.claude-plugin/marketplace.json` thêm block `presets` cho `vibecodekit-hybrid` (entry skill, docs, CLI, danh sách skill/agent/template) và tag `vibecodekit` / `rri` / `vietnamese`.
+- **Migration guide** tại `docs/VIBECODEKIT-MIGRATION.md`: pre-vibecodekit → Phase 1 → Phase 2 → Phase 3, kèm bảng số lượng agent/skill và hướng dẫn rollback.
+- **Ví dụ đầy đủ** dưới `examples/vibecodekit-hybrid/`:
+  - `landing-vn/` — landing page studio yoga Việt (locale vi, pattern landing, gate 🟡 → SHIP_WITH_FOLLOWUPS).
+  - `saas-enterprise-module/` — module Invoice cho SaaS Việt (locale vi, pattern enterprise-module, 3 gate đều 🟢 → SHIP).
+- **Auto-detect locale tại SCAN**: thứ tự tín hiệu xác định `.omc/locale.json` → `OMC_LOCALE` → `--locale` → heuristic README (diacritic density > 8 %) → heuristic manifest (`package.json`/`pyproject.toml`/`Cargo.toml`) → mặc định `en`. Tín hiệu thắng + bằng chứng được ghi vào section 8 của scan report; locale non-default được truyền lại cho orchestrator để các stage sau thừa kế.
+- **Fixture PDF Unicode cho RRI-T**: `templates/vibecodekit-hybrid/fixtures/pdf-unicode/` với 8 chuỗi probe (`PDF-VN-01` … `PDF-VN-08`) + `probes.json` có cờ `fail_if_missing` để phân biệt trường danh tính/pháp lý (FAIL nếu vỡ) và mất dấu thẩm mỹ (PAINFUL).
+
+### Ví dụ CLI
+
+```bash
+# scaffold artifact, không cần mở Claude
+omc vibecodekit scaffold checkout-flow
+omc vibecodekit scaffold landing-vn --locale vi
+
+# xem release gate hiện tại
+omc vibecodekit status
+
+# liệt kê pattern + locale có sẵn
+omc vibecodekit patterns
+omc vibecodekit locales
+```
+
+### Thang tín hiệu locale (từ cao xuống thấp)
+
+| Ưu tiên | Tín hiệu | Nguồn | Ghi chú |
+|---------|----------|-------|---------|
+| 1 | `omc-locale-json` | `.omc/locale.json` | Ghi đè tường minh, luôn thắng |
+| 2 | `env:OMC_LOCALE` | Biến môi trường | Giữ qua nhiều phiên trong cùng shell |
+| 3 | `flag:--locale` | CLI / invocation flag | Ghi đè cho một run |
+| 4 | `readme-heuristic` | `README.md` (fallback `README.vi.md`) | Tỷ lệ nguyên âm mang dấu > 8 % trong 400 ký tự bất kỳ |
+| 5 | `manifest-heuristic` | `package.json` / `pyproject.toml` / `Cargo.toml` | Dấu tiếng Việt trong description / author / keywords |
+| 6 | `default` | — | Tiếng Anh |
+
+## Ngoài phạm vi (để cho phase sau)
+
+- Publish `.omc/deliverables.json` thành GitHub Check Run.
+- Tách persona bank tiếng Việt thành skill plugin độc lập để preset khác dùng lại.
+- Dashboard web hiển thị release gate.
 
 ## Credit
 

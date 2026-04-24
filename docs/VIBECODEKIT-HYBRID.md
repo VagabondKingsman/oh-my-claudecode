@@ -167,10 +167,57 @@ Available flags:
 }
 ```
 
-## What Phase 3 is planned to add
+## What Phase 3 delivers (this PR)
 
-- CLI subcommand `omc vibecodekit`, marketplace preset, migration guide, worked examples.
-- Fuller Vietnamese locale: SCAN-driven auto-detection of VN-first projects, richer VN persona banks, Unicode-font PDF export checks baked into RRI-T fixtures.
+- **CLI surface** `omc vibecodekit` (Node, Commander-based) with four subcommands:
+  - `scaffold <slug> [--locale en|vi]` — creates the canonical `.omc/{research,specs,plans,design,verify}/` skeleton and seeds `.omc/deliverables.json`.
+  - `status [<slug>]` — reads and pretty-prints the current release gate from `.omc/deliverables.json`.
+  - `patterns` — lists the 7 vision patterns bundled under `templates/vibecodekit-hybrid/vision-patterns/`.
+  - `locales` — lists available locale overlays under `locale/`.
+  - `help` — usage (default when no subcommand is provided).
+- **Marketplace preset entry** under `.claude-plugin/marketplace.json`. The plugin tags are extended with `vibecodekit`, `rri`, `vietnamese`; a new `presets` block advertises `vibecodekit-hybrid` with its entry skill, docs pointer, CLI surface, bundled skills, agents, and templates directory.
+- **Migration guide** at `docs/VIBECODEKIT-MIGRATION.md` covering pre-vibecodekit → Phase 1 → Phase 2 → Phase 3, with rollback steps and an agent/skill count matrix.
+- **Worked examples** under `examples/vibecodekit-hybrid/`:
+  - `landing-vn/` — Vietnamese yoga-studio landing page (locale=vi, pattern=landing, gate=🟡 → SHIP_WITH_FOLLOWUPS).
+  - `saas-enterprise-module/` — invoice module for a VN Enterprise SaaS (locale=vi, pattern=enterprise-module, all three RRI gates green → SHIP).
+- **SCAN locale auto-detection** (`vibecodekit-hybrid-scan/SKILL.md`) with a deterministic signal ladder: `.omc/locale.json` override → `OMC_LOCALE` env → `--locale` flag → README diacritic-density heuristic (window > 8 %) → manifest heuristic (`package.json` / `pyproject.toml` / `Cargo.toml` description fields) → default `en`. The winning signal + evidence snippet is recorded in section 8 of the scan report template, and a non-default locale is echoed back to the orchestrator so downstream stages inherit it without an explicit flag.
+- **PDF-export fixtures for the RRI-T Vietnamese rubric** at `templates/vibecodekit-hybrid/fixtures/pdf-unicode/`. 8 canonical probe strings (`PDF-VN-01` … `PDF-VN-08`) in both `README.md` and machine-readable `probes.json`, with `fail_if_missing` flags to distinguish identity/legal fields (FAIL if garbled) from cosmetic diacritic loss (PAINFUL).
+
+### Phase 3 CLI surface
+
+```bash
+# Scaffold artifact skeleton (no Claude session needed)
+omc vibecodekit scaffold checkout-flow
+omc vibecodekit scaffold landing-vn --locale vi
+
+# Inspect the current release gate
+omc vibecodekit status
+
+# Discover patterns and locales
+omc vibecodekit patterns
+omc vibecodekit locales
+```
+
+The CLI only manages on-disk state — the actual pipeline still runs inside a Claude Code session via `/oh-my-claudecode:vibecodekit-hybrid`.
+
+### Locale auto-detection signal ladder
+
+| Priority | Signal | Source | Notes |
+|----------|--------|--------|-------|
+| 1 | `omc-locale-json` | `.omc/locale.json` `{ "locale": "vi" }` | Explicit override, always wins |
+| 2 | `env:OMC_LOCALE` | Env var | Survives across sessions for a given shell |
+| 3 | `flag:--locale` | Orchestrator CLI / invocation flag | Per-run override |
+| 4 | `readme-heuristic` | `README.md` (fallback `README.vi.md`) | `vowels_with_VN_diacritic / total_vowels > 0.08` in any 400-char window |
+| 5 | `manifest-heuristic` | `package.json` / `pyproject.toml` / `Cargo.toml` | Vietnamese diacritic in description / author / keywords |
+| 6 | `default` | — | English |
+
+## What is still out of scope
+
+Phase 3 intentionally stops at the CLI + preset + examples + heuristic layer. The runtime itself does not read `OMC_LOCALE` — skills and templates do. A future phase could:
+
+- Auto-publish `.omc/deliverables.json` as a GitHub Check Run.
+- Convert the Vietnamese persona banks into a Claude skill plugin that other presets can depend on.
+- Add a web-dashboard surface for the release gate.
 
 ## Attribution
 
