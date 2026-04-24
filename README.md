@@ -244,12 +244,22 @@ Multiple strategies for different use cases — from Team-backed orchestration t
 
 Combines the [Vibecodekit v5 Contractor–Worker methodology](./docs/VIBECODEKIT-HYBRID.md) with OMC's runtime: 5 RRI personas × 3 interview modes, 7 vision patterns (landing / saas / dashboard / blog / portfolio / enterprise-module / custom), 4-level verify verdict (PASS / FAIL / PAINFUL / MISSING), and standardized TIP / Completion Report artifacts.
 
+Phase 2 adds three additional sub-skills and two quality-focused agents:
+
+- `vibecodekit-hybrid-rri-ux` + `rri-ux-critic` — Flow-Physics UX critique (5 UX personas × 7 UX dimensions × 8 axes).
+- `vibecodekit-hybrid-rri-t` + `rri-tester` — adversarial QA walk (5 testing personas × 7 dimensions × 8 stress axes, 4-level verdict per test case).
+- `vibecodekit-hybrid-rri-ui` — 5-phase UI design pipeline that composes the two above with a 6-criterion release gate for Enterprise SaaS UI.
+- VERIFY now emits a structured release gate into `.omc/deliverables.json`; `OMC_LOCALE=vi` unlocks the Vietnamese overlay (`locale/vi/agents/*.vi.md`, 12-item Vietnamese anti-pattern checklist).
+
 ```
 vibecodekit build me a landing page for X
 /oh-my-claudecode:vibecodekit-hybrid --pattern saas --locale vi
+/oh-my-claudecode:vibecodekit-hybrid-rri-ui <slug> --module checkout
+rri-t this build                        # sub-skill routing (adversarial QA only)
+rri-ux critique the checkout flow       # sub-skill routing (pre-design UX critique)
 ```
 
-Vietnamese docs: [`locale/vi/VIBECODEKIT-HYBRID.vi.md`](./locale/vi/VIBECODEKIT-HYBRID.vi.md).
+Vietnamese docs: [`locale/vi/VIBECODEKIT-HYBRID.vi.md`](./locale/vi/VIBECODEKIT-HYBRID.vi.md), locale overview: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md).
 
 ### Intelligent Orchestration
 

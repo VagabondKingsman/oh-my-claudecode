@@ -13,6 +13,9 @@ SCAN → RRI → VISION → BLUEPRINT → TASK GRAPH → BUILD → VERIFY → RE
 | `tip.md` | TASK GRAPH | Task Instruction Pack — one per delegated worker task |
 | `completion-report.md` | BUILD | Structured worker report back to orchestrator |
 | `verify-report.md` | VERIFY | RRI-Reverse traceability + stress-test results |
+| `rri-t-report.md` | VERIFY (Phase 2) | Adversarial QA walk — 5 testing personas × 7 dimensions × 8 stress axes, 4-level verdict per test case |
+| `rri-ux-report.md` | VERIFY (Phase 2) | Flow-Physics UX critique — 5 UX personas × 7 UX dimensions × 8 axes, S→V→P→F→I issues |
+| `rri-ui-report.md` | VERIFY (Phase 2) | Composed UI design pipeline — 5 phases, 6-criterion release gate |
 | `vision-patterns/landing.md` | VISION | Landing page structural pattern |
 | `vision-patterns/saas.md` | VISION | SaaS app structural pattern |
 | `vision-patterns/dashboard.md` | VISION | Dashboard / analytics pattern |

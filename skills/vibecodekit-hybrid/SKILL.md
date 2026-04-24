@@ -2,7 +2,7 @@
 name: vibecodekit-hybrid
 description: Contractor–Worker pipeline combining Vibecodekit v5 methodology with OMC runtime (SCAN → RRI → VISION → BLUEPRINT → BUILD → VERIFY → REFINE)
 argument-hint: "[--interactive] [--pattern landing|saas|dashboard|blog|portfolio|enterprise-module|custom] [--locale en|vi] [--auto] <idea>"
-pipeline: [vibecodekit-hybrid-scan, vibecodekit-hybrid-rri, vibecodekit-hybrid-vision, ralplan, autopilot, vibecodekit-hybrid-verify, ai-slop-cleaner]
+pipeline: [vibecodekit-hybrid-scan, vibecodekit-hybrid-rri, vibecodekit-hybrid-vision, ralplan, vibecodekit-hybrid-rri-ux, autopilot, vibecodekit-hybrid-rri-t, vibecodekit-hybrid-verify, ai-slop-cleaner]
 next-skill: vibecodekit-hybrid-scan
 handoff: .omc/research/vibecodekit-hybrid-scan-*.md
 level: 4
@@ -67,6 +67,12 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 - Input: the scan + RRI + vision artifacts.
 - Output: `.omc/plans/vibecodekit-hybrid-<slug>.md` conforming to `templates/vibecodekit-hybrid/blueprint.md`, including the **RRI Requirements Matrix** and **Task Decomposition Preview**.
 
+### Stage 4b — RRI-UX critique (optional, delegate to `vibecodekit-hybrid-rri-ux`)
+- Trigger when the Blueprint contains UI scope AND mockups / wireframes exist.
+- Catches Flow Physics anti-patterns before code is written.
+- Artifact: `.omc/research/vibecodekit-hybrid-rri-ux-<slug>.md`; updates `rri_ux_gate` in `.omc/deliverables.json`.
+- Any ❌ BROKEN items must be resolved (or explicitly waived) before BUILD.
+
 ### Stage 5 — APPROVED gate (only in `--interactive`)
 - Use `AskUserQuestion` with three options:
   - **APPROVED** — proceed to BUILD
@@ -81,10 +87,16 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 - Each delegated task MUST be handed off using a TIP (`templates/vibecodekit-hybrid/tip.md`).
 - Each worker MUST return a Completion Report (`templates/vibecodekit-hybrid/completion-report.md`).
 
+### Stage 6b — RRI-T adversarial QA (optional, delegate to `vibecodekit-hybrid-rri-t`)
+- Trigger after BUILD when the Blueprint scope warrants a full adversarial walk (e.g., public release, multi-persona impact, security surface).
+- Runs 5 testing personas × 7 dimensions × 8 stress axes; records 4-level verdict per test case.
+- Artifact: `.omc/verify/vibecodekit-hybrid-rri-t-<slug>.md`; updates `rri_t_gate` in `.omc/deliverables.json`.
+
 ### Stage 7 — VERIFY (delegate to `vibecodekit-hybrid-verify`)
 - Invoke `Skill("oh-my-claudecode:vibecodekit-hybrid-verify")` with the blueprint path.
 - Required artifact: `.omc/plans/vibecodekit-hybrid-verify-<slug>.md` conforming to `templates/vibecodekit-hybrid/verify-report.md`.
 - Verdict uses 4 levels: PASS ✅ / FAIL ❌ / PAINFUL ⚠️ / MISSING 🔲.
+- VERIFY aggregates `rri_t_gate` / `rri_ux_gate` / `rri_ui_gate` from `.omc/deliverables.json` into the final release decision.
 
 ### Stage 8 — REFINE (delegate to `ai-slop-cleaner`)
 - Only run if VERIFY produced any PAINFUL / MISSING rows, OR the user explicitly requested a cleanup pass.
@@ -136,7 +148,8 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 ## Locale behaviour
 - Markdown headings and section names: always English.
 - User-facing prompts and artifact body text: match locale.
-- Vietnamese-specific UX/UI rules (VND, DD/MM/YYYY, CCCD/CMND, diacritic-insensitive search) are introduced in Phase 2 via `templates/rules/locale/vi/`. This skill declares the hook but does not enforce it yet.
+- Opt-in via `OMC_LOCALE=vi` env var (or `--locale vi` flag). When active, every sub-skill reads `locale/vi/*.vi.md` for persona bank, TIP / Completion Report / Blueprint / Verify prompt strings, and enables the Vietnamese-specific anti-pattern checklist (VND, DD/MM/YYYY, CCCD/CMND, diacritic-insensitive search, longest-VN-text buffer at 1440 / 768 / 375 px).
+- A VN-first project detected in SCAN (README or package.json declares Vietnamese) is treated as `OMC_LOCALE=vi` even if the env var is unset.
 
 ## Attribution
 Adapted from Vibecodekit v5.0 (Contractor–Worker Protocol) and the RRI methodology family (RRI, RRI-T, RRI-UI, RRI-UX). Integrated as an OMC skill-pack; the OMC runtime is unchanged.

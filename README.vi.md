@@ -164,12 +164,22 @@ Nhiều chiến lược cho nhiều tình huống — từ điều phối dựa 
 
 Kết hợp [phương pháp Chủ thầu–Thợ của Vibecodekit v5](./locale/vi/VIBECODEKIT-HYBRID.vi.md) với runtime OMC: 5 persona RRI × 3 chế độ phỏng vấn, 7 vision pattern (landing / saas / dashboard / blog / portfolio / enterprise-module / custom), verdict 4 mức (PASS / FAIL / PAINFUL / MISSING), template TIP & Completion Report chuẩn hoá.
 
+Phase 2 bổ sung 3 sub-skill + 2 agent chất lượng:
+
+- `vibecodekit-hybrid-rri-ux` + `rri-ux-critic` — phê bình UX theo Flow Physics (5 UX persona × 7 UX dimension × 8 trục).
+- `vibecodekit-hybrid-rri-t` + `rri-tester` — stress-test 5 persona × 7 dimension × 8 stress axis với verdict 4 mức.
+- `vibecodekit-hybrid-rri-ui` — pipeline UI 5 phase, gắn release gate 6 tiêu chí cho Enterprise SaaS.
+- VERIFY ghi release gate vào `.omc/deliverables.json`; bật `OMC_LOCALE=vi` để mở overlay tiếng Việt (`locale/vi/agents/*.vi.md`, 12 anti-pattern VN bắt buộc).
+
 ```
 vibecodekit build me một landing page cho X
 /oh-my-claudecode:vibecodekit-hybrid --pattern saas --locale vi
+/oh-my-claudecode:vibecodekit-hybrid-rri-ui <slug> --module checkout
+rri-t cho build này                        # chỉ chạy stage adversarial QA
+rri-ux critique màn thanh toán            # chỉ chạy stage critique trước khi code
 ```
 
-Tài liệu tiếng Anh: [`docs/VIBECODEKIT-HYBRID.md`](./docs/VIBECODEKIT-HYBRID.md).
+Tài liệu tiếng Anh: [`docs/VIBECODEKIT-HYBRID.md`](./docs/VIBECODEKIT-HYBRID.md). Overview locale: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md).
 
 ### Điều phối thông minh
 

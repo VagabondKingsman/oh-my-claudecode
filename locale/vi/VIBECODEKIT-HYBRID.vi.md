@@ -130,10 +130,20 @@ Các cờ hỗ trợ:
 - Tích hợp keyword-detector: `vibecodekit`, `vibecodekit-hybrid`, `vibecode-master`.
 - Docs: file tiếng Anh `docs/VIBECODEKIT-HYBRID.md` + file này (Việt).
 
-## Phase 2 & 3 sắp tới
+## Phase 2 đã bàn giao (PR này)
 
-- **Phase 2**: agent `rri-tester`, `rri-ux-critic`; skill RRI-UI; opt-in Vietnamese locale rules qua `OMC_LOCALE=vi`; 4-level verdict được lưu vào `deliverables.json`.
-- **Phase 3**: CLI `omc vibecodekit`, preset marketplace, migration guide, ví dụ đầy đủ.
+- Thêm 3 skill: `vibecodekit-hybrid-rri-t`, `vibecodekit-hybrid-rri-ux`, `vibecodekit-hybrid-rri-ui`.
+- Thêm 2 agent: `rri-tester` (5 persona test × 7 dimension × 8 stress axis) và `rri-ux-critic` (5 UX persona × 7 UX dimension × 8 trục Flow Physics).
+- Thêm 3 template: `rri-t-report.md`, `rri-ux-report.md`, `rri-ui-report.md`.
+- Orchestrator pipeline gắn thêm Stage 4b (RRI-UX trước khi code) và Stage 6b (RRI-T sau BUILD).
+- VERIFY ghi quyết định release vào `.omc/deliverables.json` (`verify_gate`, `verdict_counts`, `release_decision`, các gate con `rri_t_gate` / `rri_ux_gate` / `rri_ui_gate`).
+- Keyword detector bổ sung pattern `rri-t`, `rri-ux`, `rri-ui`, `ui-design-pipeline`, `flow-physics(-critique|-test)?` (orchestrator vẫn có priority cao hơn).
+- Opt-in Vietnamese qua `OMC_LOCALE=vi`: overlay tại `locale/vi/agents/*.vi.md`, `locale/vi/skills/*.vi.md`, `locale/vi/README.vi.md` (12 anti-pattern VN bắt buộc).
+
+## Phase 3 dự kiến
+
+- CLI `omc vibecodekit`, preset marketplace, migration guide, ví dụ đầy đủ.
+- Auto-detect VN-first project từ SCAN, persona bank tiếng Việt sâu hơn, check PDF font Unicode trong fixture RRI-T.
 
 ## Credit
 

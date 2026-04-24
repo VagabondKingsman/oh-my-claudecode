@@ -124,7 +124,7 @@ Available flags:
 | `qa-tester` | Called inside `vibecodekit-hybrid-verify` for persona walkthroughs |
 | `ai-slop-cleaner` | Used during REFINE; bounded by the approved Blueprint |
 
-## What Phase 1 delivers (this PR)
+## What Phase 1 delivers
 
 - 5 skills: `vibecodekit-hybrid` + 4 sub-skills (`-scan`, `-rri`, `-vision`, `-verify`)
 - 1 agent: `rri-interviewer` (5 personas × 3 modes)
@@ -132,10 +132,45 @@ Available flags:
 - Keyword detector integration: `vibecodekit`, `vibecodekit-hybrid`, `vibecode-master`
 - Docs: this file + README sections
 
-## What Phase 2 and 3 are planned to add
+## What Phase 2 delivers (this PR)
 
-- **Phase 2**: `rri-tester`, `rri-ux-critic` agents, RRI-UI skill, Vietnamese locale rules opt-in via `OMC_LOCALE=vi`, structured 4-level verdict persisted to `deliverables.json`.
-- **Phase 3**: CLI subcommand `omc vibecodekit`, marketplace preset, migration guide, worked examples.
+- 3 additional skills: `vibecodekit-hybrid-rri-t`, `vibecodekit-hybrid-rri-ux`, `vibecodekit-hybrid-rri-ui` (total: 8 vibecodekit skills).
+- 2 additional agents: `rri-tester` (5 testing personas × 7 dimensions × 8 stress axes, 4-level verdict) and `rri-ux-critic` (5 UX personas × 7 UX dimensions × 8 Flow Physics axes).
+- 3 additional templates: `rri-t-report.md`, `rri-ux-report.md`, `rri-ui-report.md`.
+- Orchestrator pipeline extended with optional Stage 4b (RRI-UX pre-design critique) and Stage 6b (RRI-T adversarial QA).
+- VERIFY stage now writes a structured gate into `.omc/deliverables.json` (`verify_gate`, `verdict_counts`, `release_decision`, and any `rri_t_gate` / `rri_ux_gate` / `rri_ui_gate` produced by sub-skills).
+- Keyword detector extended with sub-skill routes: `rri-t`, `rri-ux`, `rri-ui`, `ui-design-pipeline`, `flow-physics(-critique|-test)?`. The orchestrator keyword still wins when both are present.
+- Vietnamese locale opt-in (`OMC_LOCALE=vi` env var or `--locale vi` flag) surfaces overlays under `locale/vi/` (agents + skill + Vietnamese anti-pattern checklist).
+
+### Phase 2 pipeline map (additions)
+
+| # | Stage | Skill / Agent | Artifact |
+|---|-------|---------------|----------|
+| 4b | RRI-UX (pre-design critique) | `vibecodekit-hybrid-rri-ux` → `rri-ux-critic` | `.omc/research/vibecodekit-hybrid-rri-ux-<slug>.md` + `rri_ux_gate` |
+| 6b | RRI-T (adversarial QA) | `vibecodekit-hybrid-rri-t` → `rri-tester` | `.omc/verify/vibecodekit-hybrid-rri-t-<slug>.md` + `rri_t_gate` |
+| — | RRI-UI (composed pipeline) | `vibecodekit-hybrid-rri-ui` (5 phases, wraps `-rri-ux` + `-rri-t`) | `.omc/design/vibecodekit-hybrid-rri-ui-<slug>.md` + `rri_ui_gate` |
+
+### Deliverables JSON contract
+
+`vibecodekit-hybrid-verify` is the single writer of the overall release decision. Expected shape:
+
+```json
+{
+  "slug": "<slug>",
+  "verify_gate": "🟢|🟡|🔴",
+  "verdict_counts": { "pass": 0, "fail": 0, "painful": 0, "missing": 0 },
+  "release_decision": "SHIP|SHIP_WITH_FOLLOWUPS|DO_NOT_SHIP",
+  "rri_t_gate": "🟢|🟡|🔴",
+  "rri_ux_gate": "🟢|🟡|🔴",
+  "rri_ui_gate": "🟢|🟡|🔴",
+  "artifact": ".omc/plans/vibecodekit-hybrid-verify-<slug>.md"
+}
+```
+
+## What Phase 3 is planned to add
+
+- CLI subcommand `omc vibecodekit`, marketplace preset, migration guide, worked examples.
+- Fuller Vietnamese locale: SCAN-driven auto-detection of VN-first projects, richer VN persona banks, Unicode-font PDF export checks baked into RRI-T fixtures.
 
 ## Attribution
 
