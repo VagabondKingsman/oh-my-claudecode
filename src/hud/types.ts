@@ -9,9 +9,11 @@ import type { ApiKeySource } from './elements/api-key-source.js';
 import type { SessionSummaryState } from './elements/session-summary.js';
 import type { MissionBoardConfig, MissionBoardState } from './mission-board.js';
 import { DEFAULT_MISSION_BOARD_CONFIG } from './mission-board.js';
+import type { VibecodekitGateForHud } from './omc-state.js';
 
 // Re-export for convenience
 export type { AutopilotStateForHud, ApiKeySource, SessionSummaryState };
+export type { VibecodekitGateForHud };
 
 // ============================================================================
 // HUD State
@@ -308,6 +310,13 @@ export interface HudRenderContext {
   /** Autopilot state */
   autopilot: AutopilotStateForHud | null;
 
+  /**
+   * Vibecodekit Hybrid release gate read from `.omc/deliverables.json`.
+   * Optional + opt-in: only populated when `elements.vibecodekitGate` is true,
+   * so existing HUD mocks remain valid without modification.
+   */
+  vibecodekitGate?: VibecodekitGateForHud | null;
+
   /** Active subagents from transcript */
   activeAgents: ActiveAgent[];
 
@@ -441,6 +450,7 @@ export interface HudElementConfig {
   ralph: boolean;
   autopilot: boolean;
   prdStory: boolean;
+  vibecodekitGate?: boolean;   // Show vibecodekit-hybrid release gate (opt-in; reads `.omc/deliverables.json`)
   activeSkills: boolean;
   lastSkill: boolean;
   contextBar: boolean;
@@ -518,6 +528,7 @@ export const DEFAULT_ELEMENT_ORDER: Required<LayoutConfig> = {
   main: [
     'omcLabel', 'rateLimits', 'customBuckets', 'permission', 'thinking',
     'promptTime', 'session', 'tokens', 'ralph', 'autopilot', 'prd',
+    'vibecodekitGate',
     'skills', 'lastSkill', 'contextBar', 'agents', 'background',
     'callCounts', 'lastTool', 'sessionSummary',
   ],
