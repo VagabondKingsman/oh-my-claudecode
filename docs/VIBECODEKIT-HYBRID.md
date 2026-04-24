@@ -263,13 +263,46 @@ omc vibecodekit status
 # →   locale_signal    : omc-locale-json (resolved=vi)
 ```
 
+## What Phase 4a delivers (this PR)
+
+Phase 4a turns the release gate written by `vibecodekit-hybrid-verify` into a real GitHub Check Run:
+
+- `.github/workflows/vibecodekit-gate.yml` — runs on every PR that touches `.omc/deliverables.json`, the workflow itself, or the check script. Also triggers manually (`workflow_dispatch`).
+- `scripts/vibecodekit-gate-check.mjs` — dependency-free Node script that reads `.omc/deliverables.json` and produces a structured verdict + a GitHub step summary:
+
+  | Verdict | CI conclusion | Exit code | Default behaviour |
+  |---------|---------------|-----------|-------------------|
+  | 🟢 `SHIP` | `success` | 0 | Merge allowed |
+  | 🟡 `SHIP_WITH_FOLLOWUPS` | `neutral` | 0 | Merge allowed, follow-ups tracked |
+  | 🔴 `DO_NOT_SHIP` | `failure` | 1 | Merge blocked |
+  | *(file absent)* | `neutral` | 0 | No-op — never blocks non-vibecodekit repos |
+
+  Flip `workflow_dispatch.inputs.strict=true` (or set env `VCK_STRICT=1`) to also fail on 🟡.
+- Step summary is a compact table rendered on the PR check: gate glyph, release decision, slug, verdict counts, and RRI sub-gates (RRI-T / RRI-UX / RRI-UI).
+- 9 smoke tests under `src/__tests__/vibecodekit-gate-check.test.ts` that execute the script as a subprocess and inspect stdout + `GITHUB_STEP_SUMMARY` output across 🟢 / 🟡 / 🔴 / strict / absent / malformed / custom-path / env-override paths.
+
+### Using the check locally
+
+```bash
+# Read .omc/deliverables.json in the current repo and print the verdict
+node scripts/vibecodekit-gate-check.mjs
+
+# Strict mode — 🟡 also exits 1
+node scripts/vibecodekit-gate-check.mjs --strict
+
+# JSON mode — machine-readable decision record
+node scripts/vibecodekit-gate-check.mjs --json
+
+# Custom path (for multi-project repos or CI with non-standard layout)
+node scripts/vibecodekit-gate-check.mjs --path subapp/.omc/deliverables.json
+```
+
 ## What is still out of scope
 
-Phase 4f deliberately stops at the read-only HUD / locale surface. Future phases could:
+Phase 4a / 4f deliberately stop at the read-only HUD + CI surface. Future phases could:
 
-- Auto-publish `.omc/deliverables.json` as a GitHub Check Run (Phase 4a candidate).
 - Convert the Vietnamese persona banks into a standalone Claude skill plugin.
-- Add a hook surface that blocks `git push` when the gate is 🔴 (opt-in).
+- Add a hook surface that blocks `git push` when the gate is 🔴 (opt-in, client-side).
 - Add a web-dashboard surface for the release gate.
 
 ## Attribution
