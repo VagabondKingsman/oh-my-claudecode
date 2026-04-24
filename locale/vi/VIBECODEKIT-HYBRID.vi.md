@@ -130,10 +130,62 @@ Các cờ hỗ trợ:
 - Tích hợp keyword-detector: `vibecodekit`, `vibecodekit-hybrid`, `vibecode-master`.
 - Docs: file tiếng Anh `docs/VIBECODEKIT-HYBRID.md` + file này (Việt).
 
-## Phase 2 & 3 sắp tới
+## Phase 2 đã bàn giao (PR này)
 
-- **Phase 2**: agent `rri-tester`, `rri-ux-critic`; skill RRI-UI; opt-in Vietnamese locale rules qua `OMC_LOCALE=vi`; 4-level verdict được lưu vào `deliverables.json`.
-- **Phase 3**: CLI `omc vibecodekit`, preset marketplace, migration guide, ví dụ đầy đủ.
+- Thêm 3 skill: `vibecodekit-hybrid-rri-t`, `vibecodekit-hybrid-rri-ux`, `vibecodekit-hybrid-rri-ui`.
+- Thêm 2 agent: `rri-tester` (5 persona test × 7 dimension × 8 stress axis) và `rri-ux-critic` (5 UX persona × 7 UX dimension × 8 trục Flow Physics).
+- Thêm 3 template: `rri-t-report.md`, `rri-ux-report.md`, `rri-ui-report.md`.
+- Orchestrator pipeline gắn thêm Stage 4b (RRI-UX trước khi code) và Stage 6b (RRI-T sau BUILD).
+- VERIFY ghi quyết định release vào `.omc/deliverables.json` (`verify_gate`, `verdict_counts`, `release_decision`, các gate con `rri_t_gate` / `rri_ux_gate` / `rri_ui_gate`).
+- Keyword detector bổ sung pattern `rri-t`, `rri-ux`, `rri-ui`, `ui-design-pipeline`, `flow-physics(-critique|-test)?` (orchestrator vẫn có priority cao hơn).
+- Opt-in Vietnamese qua `OMC_LOCALE=vi`: overlay tại `locale/vi/agents/*.vi.md`, `locale/vi/skills/*.vi.md`, `locale/vi/README.vi.md` (12 anti-pattern VN bắt buộc).
+
+## Phase 3 đã bàn giao (PR này)
+
+- **CLI `omc vibecodekit`** (Node/Commander) với 4 subcommand:
+  - `scaffold <slug> [--locale en|vi]` — tạo skeleton `.omc/{research,specs,plans,design,verify}/` + `.omc/deliverables.json`.
+  - `status [<slug>]` — in release gate hiện tại từ `deliverables.json`.
+  - `patterns` — liệt kê 7 vision pattern.
+  - `locales` — liệt kê overlay locale (en + vi).
+- **Preset marketplace**: `.claude-plugin/marketplace.json` thêm block `presets` cho `vibecodekit-hybrid` (entry skill, docs, CLI, danh sách skill/agent/template) và tag `vibecodekit` / `rri` / `vietnamese`.
+- **Migration guide** tại `docs/VIBECODEKIT-MIGRATION.md`: pre-vibecodekit → Phase 1 → Phase 2 → Phase 3, kèm bảng số lượng agent/skill và hướng dẫn rollback.
+- **Ví dụ đầy đủ** dưới `examples/vibecodekit-hybrid/`:
+  - `landing-vn/` — landing page studio yoga Việt (locale vi, pattern landing, gate 🟡 → SHIP_WITH_FOLLOWUPS).
+  - `saas-enterprise-module/` — module Invoice cho SaaS Việt (locale vi, pattern enterprise-module, 3 gate đều 🟢 → SHIP).
+- **Auto-detect locale tại SCAN**: thứ tự tín hiệu xác định `.omc/locale.json` → `OMC_LOCALE` → `--locale` → heuristic README (diacritic density > 8 %) → heuristic manifest (`package.json`/`pyproject.toml`/`Cargo.toml`) → mặc định `en`. Tín hiệu thắng + bằng chứng được ghi vào section 8 của scan report; locale non-default được truyền lại cho orchestrator để các stage sau thừa kế.
+- **Fixture PDF Unicode cho RRI-T**: `templates/vibecodekit-hybrid/fixtures/pdf-unicode/` với 8 chuỗi probe (`PDF-VN-01` … `PDF-VN-08`) + `probes.json` có cờ `fail_if_missing` để phân biệt trường danh tính/pháp lý (FAIL nếu vỡ) và mất dấu thẩm mỹ (PAINFUL).
+
+### Ví dụ CLI
+
+```bash
+# scaffold artifact, không cần mở Claude
+omc vibecodekit scaffold checkout-flow
+omc vibecodekit scaffold landing-vn --locale vi
+
+# xem release gate hiện tại
+omc vibecodekit status
+
+# liệt kê pattern + locale có sẵn
+omc vibecodekit patterns
+omc vibecodekit locales
+```
+
+### Thang tín hiệu locale (từ cao xuống thấp)
+
+| Ưu tiên | Tín hiệu | Nguồn | Ghi chú |
+|---------|----------|-------|---------|
+| 1 | `omc-locale-json` | `.omc/locale.json` | Ghi đè tường minh, luôn thắng |
+| 2 | `env:OMC_LOCALE` | Biến môi trường | Giữ qua nhiều phiên trong cùng shell |
+| 3 | `flag:--locale` | CLI / invocation flag | Ghi đè cho một run |
+| 4 | `readme-heuristic` | `README.md` (fallback `README.vi.md`) | Tỷ lệ nguyên âm mang dấu > 8 % trong 400 ký tự bất kỳ |
+| 5 | `manifest-heuristic` | `package.json` / `pyproject.toml` / `Cargo.toml` | Dấu tiếng Việt trong description / author / keywords |
+| 6 | `default` | — | Tiếng Anh |
+
+## Ngoài phạm vi (để cho phase sau)
+
+- Publish `.omc/deliverables.json` thành GitHub Check Run.
+- Tách persona bank tiếng Việt thành skill plugin độc lập để preset khác dùng lại.
+- Dashboard web hiển thị release gate.
 
 ## Credit
 

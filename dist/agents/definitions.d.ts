@@ -21,6 +21,8 @@ export { scientistAgent } from './scientist.js';
 export { exploreAgent } from './explore.js';
 export { tracerAgent } from './tracer.js';
 export { rriInterviewerAgent } from './rri-interviewer.js';
+export { rriTesterAgent } from './rri-tester.js';
+export { rriUxCriticAgent } from './rri-ux-critic.js';
 export { documentSpecialistAgent } from './document-specialist.js';
 export { loadAgentPrompt };
 /**

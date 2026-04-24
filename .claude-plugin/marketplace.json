@@ -23,7 +23,33 @@
         "orchestration",
         "delegation",
         "todo-management",
-        "ultrawork"
+        "ultrawork",
+        "vibecodekit",
+        "rri",
+        "vietnamese"
+      ],
+      "presets": [
+        {
+          "name": "vibecodekit-hybrid",
+          "description": "Contractor-Worker pipeline (SCAN -> RRI -> VISION -> BLUEPRINT -> BUILD -> VERIFY -> REFINE) with adversarial RRI-T QA, Flow-Physics RRI-UX critique, and combined RRI-UI design pipeline. Vietnamese locale opt-in via OMC_LOCALE=vi.",
+          "entrySkill": "vibecodekit-hybrid",
+          "docs": "./docs/VIBECODEKIT-HYBRID.md",
+          "readmeVi": "./locale/vi/VIBECODEKIT-HYBRID.vi.md",
+          "cli": "omc vibecodekit",
+          "skills": [
+            "vibecodekit-hybrid",
+            "vibecodekit-hybrid-scan",
+            "vibecodekit-hybrid-rri",
+            "vibecodekit-hybrid-vision",
+            "vibecodekit-hybrid-rri-ux",
+            "vibecodekit-hybrid-rri-t",
+            "vibecodekit-hybrid-rri-ui",
+            "vibecodekit-hybrid-verify"
+          ],
+          "agents": ["rri-interviewer", "rri-tester", "rri-ux-critic"],
+          "templates": "./templates/vibecodekit-hybrid/",
+          "tags": ["vibecodekit", "rri", "contractor-worker", "flow-physics", "vietnamese"]
+        }
       ]
     }
   ],
