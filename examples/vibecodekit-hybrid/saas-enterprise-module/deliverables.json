@@ -1,0 +1,31 @@
+{
+  "slug": "saas-enterprise-module",
+  "locale": "vi",
+  "pattern": "enterprise-module",
+  "verify_gate": "🟢",
+  "verdict_counts": { "pass": 36, "fail": 0, "painful": 2, "missing": 0 },
+  "release_decision": "SHIP",
+  "rri_t_gate": "🟢",
+  "rri_ux_gate": "🟢",
+  "rri_ui_gate": "🟢",
+  "artifact": ".omc/plans/vibecodekit-hybrid-verify-saas-enterprise-module.md",
+  "updated_at": "2026-04-24T00:00:00.000Z",
+  "followups": [
+    {
+      "id": "FU-001",
+      "from": "rri-t",
+      "verdict": "PAINFUL",
+      "summary": "PDF export drops diacritics when the embedded font misses U+1EA7 (ầ) and similar precomposed glyphs",
+      "owner": "executor",
+      "follow_up_tip": ".omc/plans/tips/saas-enterprise-module-fu-001.md"
+    },
+    {
+      "id": "FU-002",
+      "from": "rri-t",
+      "verdict": "PAINFUL",
+      "summary": "Invoice list filter state is not retained across tab switches in the Multi-Tasker persona walkthrough",
+      "owner": "designer",
+      "follow_up_tip": ".omc/plans/tips/saas-enterprise-module-fu-002.md"
+    }
+  ]
+}

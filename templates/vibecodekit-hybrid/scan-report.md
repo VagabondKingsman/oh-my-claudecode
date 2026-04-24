@@ -53,11 +53,21 @@ List the top-level directories / packages with a one-line purpose each.
 - Source LOC (approx.): N
 - Largest files (> 800 LOC): …
 
-## 8. Ready-to-answer questions
+## 8. Locale
+| Field | Value |
+|-------|-------|
+| Detected locale | `en` \| `vi` |
+| Winning signal | `omc-locale-json` \| `env:OMC_LOCALE` \| `flag:--locale` \| `readme-heuristic` \| `manifest-heuristic` \| `default` |
+| Evidence snippet | *(≤ 200 chars of text that triggered the heuristic, or "n/a" for explicit signals)* |
+| Non-default locale echoed to orchestrator? | yes \| no |
+
+> Phase 3: if the winning signal is `readme-heuristic` or `manifest-heuristic`, include the ratio or match string so a reviewer can audit the heuristic without re-running it.
+
+## 9. Ready-to-answer questions
 Questions that the scan already answers (so RRI must NOT ask them again):
 - …
 
-## 9. Still-open questions (handoff to RRI)
+## 10. Still-open questions (handoff to RRI)
 Questions the human still has to answer (personas / priorities / scope):
 - …
 

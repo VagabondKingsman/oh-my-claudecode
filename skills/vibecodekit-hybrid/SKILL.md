@@ -43,7 +43,9 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 <Steps>
 
 ### Stage 0 — Classify the request
-1. Detect locale (`--locale` flag > project README language > `OMC_LOCALE` env).
+1. Detect locale using the signal ladder:
+   `.omc/locale.json` override → `OMC_LOCALE` env → `--locale` flag → `vibecodekit-hybrid-scan` README/manifest heuristics (if SCAN has already run) → default `en`.
+   Record the winning signal in the scan report; a non-default locale is inherited by every downstream stage without an extra flag.
 2. Detect interactive vs auto mode (`--interactive` default, `--auto` opt-in).
 3. Detect candidate vision pattern (`--pattern` flag, else let VISION stage decide).
 4. Allocate a slug: `<short-kebab-idea>` derived from the user's request.
@@ -149,7 +151,13 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 - Markdown headings and section names: always English.
 - User-facing prompts and artifact body text: match locale.
 - Opt-in via `OMC_LOCALE=vi` env var (or `--locale vi` flag). When active, every sub-skill reads `locale/vi/*.vi.md` for persona bank, TIP / Completion Report / Blueprint / Verify prompt strings, and enables the Vietnamese-specific anti-pattern checklist (VND, DD/MM/YYYY, CCCD/CMND, diacritic-insensitive search, longest-VN-text buffer at 1440 / 768 / 375 px).
-- A VN-first project detected in SCAN (README or package.json declares Vietnamese) is treated as `OMC_LOCALE=vi` even if the env var is unset.
+- A VN-first project detected in SCAN (README diacritic-density > 8 % or Vietnamese diacritic in `package.json` / `pyproject.toml` / `Cargo.toml` description) is treated as `OMC_LOCALE=vi` even if the env var is unset. The full signal ladder lives in `skills/vibecodekit-hybrid-scan/SKILL.md` step 5.
+
+## CLI companion
+- `omc vibecodekit scaffold <slug> [--locale en|vi]` — create the canonical artifact skeleton (same paths this orchestrator produces) outside of Claude.
+- `omc vibecodekit status` — pretty-print the current release gate from `.omc/deliverables.json`.
+- `omc vibecodekit patterns` / `locales` — list available vision patterns and locale overlays.
+- The CLI is strictly for on-disk state; the pipeline itself always runs inside a Claude Code session.
 
 ## Attribution
 Adapted from Vibecodekit v5.0 (Contractor–Worker Protocol) and the RRI methodology family (RRI, RRI-T, RRI-UI, RRI-UX). Integrated as an OMC skill-pack; the OMC runtime is unchanged.

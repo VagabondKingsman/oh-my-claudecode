@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Canonical strings the RRI-T Vietnamese rubric probes against every PDF the build emits. Consumed by Phase 6b of vibecodekit-hybrid.",
+  "probes": [
+    { "id": "PDF-VN-01", "category": "diacritic-density",    "string": "Nguyễn Phương Thảo trả 1.234.567 ₫ ngày 01/02/2026",                                      "fail_if_missing": true,  "notes": "VND format + DD/MM/YYYY stress" },
+    { "id": "PDF-VN-02", "category": "rare-tone",            "string": "Quãng đường nằm giữa Tuyên Quang và Yên Bái",                                              "fail_if_missing": false, "notes": "Rare tone mark combinations" },
+    { "id": "PDF-VN-03", "category": "cccd",                 "string": "CCCD: 001234567890 — cấp ngày 12/05/2024 tại Hà Nội",                                      "fail_if_missing": true,  "notes": "Legal identifier row — FAIL if garbled" },
+    { "id": "PDF-VN-04", "category": "address-cascade",      "string": "Số 42, Phường Cửa Đông, Quận Hoàn Kiếm, Hà Nội",                                           "fail_if_missing": false, "notes": "Tỉnh → Quận → Phường cascade" },
+    { "id": "PDF-VN-05", "category": "long-line",            "string": "Dịch vụ tư vấn triển khai hệ thống kế toán quý IV năm 2026 — gói cao cấp",                "fail_if_missing": false, "notes": "Width / buffer stress" },
+    { "id": "PDF-VN-06", "category": "currency-corners",     "string": "(-250.000 ₫) và 1.000.000.000 ₫ + 0,50 ₫",                                                "fail_if_missing": false, "notes": "Negative + large grouping + decimal comma" },
+    { "id": "PDF-VN-07", "category": "mixed-email",          "string": "Email: nguyễn.thị.hồng@ví-dụ.vn",                                                          "fail_if_missing": false, "notes": "IDN + diacritic local-part" },
+    { "id": "PDF-VN-08", "category": "normalization-parity", "string": "Hà Nội",                                                                                    "fail_if_missing": true,  "notes": "NFC vs NFD must render identically" }
+  ]
+}

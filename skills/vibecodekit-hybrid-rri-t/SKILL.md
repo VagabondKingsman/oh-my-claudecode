@@ -68,5 +68,5 @@ Post-build adversarial QA pass that proves the system holds up under real-world 
 - `--personas user,security` restricts the walk to listed personas (comma-separated).
 - `--dimensions D1,D4,D7` restricts to listed testing dimensions.
 - `--stress time+data` forces a specific stress-axis mix on every test case.
-- When `OMC_LOCALE=vi`, the agent adds the Vietnamese-specific test bank automatically.
+- When `OMC_LOCALE=vi`, the agent adds the Vietnamese-specific test bank automatically **and** probes every emitted PDF against `templates/vibecodekit-hybrid/fixtures/pdf-unicode/probes.json` (8 canonical strings). Each probe contributes one verdict row under the Localization dimension; `fail_if_missing: true` probes (PDF-VN-01 / PDF-VN-03 / PDF-VN-08) escalate to FAIL when garbled, the rest to PAINFUL.
 </Advanced>

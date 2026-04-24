@@ -23,6 +23,8 @@ SCAN → RRI → VISION → BLUEPRINT → TASK GRAPH → BUILD → VERIFY → RE
 | `vision-patterns/portfolio.md` | VISION | Portfolio / showcase pattern |
 | `vision-patterns/enterprise-module.md` | VISION | Enterprise app module pattern |
 | `vision-patterns/custom.md` | VISION | Custom / hybrid fallback pattern |
+| `fixtures/pdf-unicode/README.md` | VERIFY (Phase 3) | RRI-T Vietnamese PDF export probes — 8 canonical strings with FAIL/PAINFUL escalation rules |
+| `fixtures/pdf-unicode/probes.json` | VERIFY (Phase 3) | Machine-readable form of the PDF Unicode probes for automated checks |
 
 Templates are **suggestions, not mandates**. Skills should fill in only the sections that apply to the current project and omit the rest.
 
