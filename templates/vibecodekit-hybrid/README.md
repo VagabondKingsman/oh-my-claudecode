@@ -22,6 +22,9 @@ SCAN → RRI → VISION → BLUEPRINT → TASK GRAPH → BUILD → VERIFY → RE
 | `vision-patterns/blog.md` | VISION | Blog / content site pattern |
 | `vision-patterns/portfolio.md` | VISION | Portfolio / showcase pattern |
 | `vision-patterns/enterprise-module.md` | VISION | Enterprise app module pattern |
+| `vision-patterns/mobile-app.md` | VISION (Phase 4b) | Native / cross-platform mobile app pattern (React Native / Flutter) |
+| `vision-patterns/cli-tool.md` | VISION (Phase 4b) | Command-line tool pattern (Go / Rust / Node, pipe-first UX) |
+| `vision-patterns/data-pipeline.md` | VISION (Phase 4b) | Batch / streaming data pipeline pattern (Airflow / dbt / Kafka) |
 | `vision-patterns/custom.md` | VISION | Custom / hybrid fallback pattern |
 | `fixtures/pdf-unicode/README.md` | VERIFY (Phase 3) | RRI-T Vietnamese PDF export probes — 8 canonical strings with FAIL/PAINFUL escalation rules |
 | `fixtures/pdf-unicode/probes.json` | VERIFY (Phase 3) | Machine-readable form of the PDF Unicode probes for automated checks |

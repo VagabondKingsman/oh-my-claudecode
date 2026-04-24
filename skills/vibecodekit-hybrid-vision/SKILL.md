@@ -1,14 +1,14 @@
 ---
 name: vibecodekit-hybrid-vision
-description: VISION stage of vibecodekit-hybrid — pick one of 7 canonical patterns and render the Vision section
-argument-hint: "<slug> [--pattern landing|saas|dashboard|blog|portfolio|enterprise-module|custom]"
+description: VISION stage of vibecodekit-hybrid — pick one of 10 canonical patterns and render the Vision section
+argument-hint: "<slug> [--pattern landing|saas|dashboard|blog|portfolio|enterprise-module|mobile-app|cli-tool|data-pipeline|custom]"
 next-skill: ralplan
 handoff: .omc/plans/vibecodekit-hybrid-*.md
 level: 2
 ---
 
 <Purpose>
-Stage 3 of the Vibecodekit Hybrid pipeline. Selects one of 7 canonical vision patterns and renders the Vision section of the Blueprint using the matching template from `templates/vibecodekit-hybrid/vision-patterns/`.
+Stage 3 of the Vibecodekit Hybrid pipeline. Selects one of 10 canonical vision patterns (landing, saas, dashboard, blog, portfolio, enterprise-module, mobile-app, cli-tool, data-pipeline, custom) and renders the Vision section of the Blueprint using the matching template from `templates/vibecodekit-hybrid/vision-patterns/`.
 </Purpose>
 
 <Use_When>
@@ -22,13 +22,14 @@ Stage 3 of the Vibecodekit Hybrid pipeline. Selects one of 7 canonical vision pa
 </Do_Not_Use_When>
 
 <Why_This_Exists>
-Blank-page vision writing is slow and tends to drift. Having 7 named patterns (landing, saas, dashboard, blog, portfolio, enterprise-module, custom) with explicit layouts, default stacks, non-goals, and persona-focus makes the decision fast AND reviewable. The "custom" pattern exists only as a deliberate escape hatch, not a default.
+Blank-page vision writing is slow and tends to drift. Having 10 named patterns (landing, saas, dashboard, blog, portfolio, enterprise-module, mobile-app, cli-tool, data-pipeline, custom) with explicit layouts, default stacks, non-goals, and persona-focus makes the decision fast AND reviewable. The "custom" pattern exists only as a deliberate escape hatch, not a default.
 </Why_This_Exists>
 
 <Execution_Policy>
-- Prefer the 6 standard patterns over "custom". Only choose "custom" if none of the standard patterns fit after honest review.
+- Prefer the 9 standard patterns over "custom". Only choose "custom" if none of the standard patterns fit after honest review.
 - Default stacks in pattern templates are **suggestions**, not mandates. User choices captured in RRI override the defaults — record the override in Blueprint §4.
-- Do NOT hardcode Next.js / Tailwind / Supabase as the only stack. Preserve the ability to inherit host-app stack for enterprise modules.
+- Do NOT hardcode Next.js / Tailwind / Supabase as the only stack. Preserve the ability to inherit host-app stack for enterprise modules, native stacks for mobile-app, Go/Rust for cli-tool, and warehouse stacks for data-pipeline.
+- Pattern-inference hints: authenticated + billing → `saas`; analytics console → `dashboard`; iOS/Android/React-Native/Flutter → `mobile-app`; `--help` / subcommands / stdin pipe → `cli-tool`; DAG / Airflow / dbt / Kafka / ETL → `data-pipeline`; plugin inside host app → `enterprise-module`; public long-form content → `blog`; personal showcase → `portfolio`; marketing site → `landing`.
 </Execution_Policy>
 
 <Steps>

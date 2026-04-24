@@ -51,7 +51,7 @@ The interviewer commits to exactly one mode for the whole session:
 - **Guided**: offer 2-3 balanced options with pros/cons, no recommendation.
 - **Explore**: open question first, converge to options afterwards.
 
-## The 7 vision patterns
+## The 10 vision patterns
 
 Each pattern template in `templates/vibecodekit-hybrid/vision-patterns/` declares the canonical layout, default stack (as *suggestion*, not mandate), non-goals, persona focus, Flow Physics priorities, and an acceptance skeleton:
 
@@ -61,6 +61,9 @@ Each pattern template in `templates/vibecodekit-hybrid/vision-patterns/` declare
 - `blog.md` — long-form content site
 - `portfolio.md` — personal / studio showcase
 - `enterprise-module.md` — feature module inside an existing enterprise app
+- `mobile-app.md` — native / cross-platform mobile app (Phase 4b, React Native / Flutter)
+- `cli-tool.md` — command-line tool with pipe-first UX (Phase 4b, Go / Rust / Node)
+- `data-pipeline.md` — batch / streaming data pipeline (Phase 4b, Airflow / dbt / Kafka)
 - `custom.md` — deliberate escape hatch when none of the above fits
 
 ## The 4-level verify verdict
@@ -83,7 +86,7 @@ All templates live under `templates/vibecodekit-hybrid/`:
 - `completion-report.md` — Worker → Contractor reply schema
 - `blueprint.md` — Blueprint with RRI Requirements Matrix + Task Decomposition Preview
 - `verify-report.md` — RRI-Reverse verify report with 4-level verdict
-- `vision-patterns/*.md` — the 7 vision patterns above
+- `vision-patterns/*.md` — the 10 vision patterns above
 
 ## Invocation
 
@@ -107,7 +110,7 @@ Available flags:
 
 - `--interactive` (default): stop at APPROVED gate after BLUEPRINT
 - `--auto`: bypass APPROVED gate; treat blueprint as pre-approved
-- `--pattern <one of landing|saas|dashboard|blog|portfolio|enterprise-module|custom>`: override auto-detection
+- `--pattern <one of landing|saas|dashboard|blog|portfolio|enterprise-module|mobile-app|cli-tool|data-pipeline|custom>`: override auto-detection
 - `--locale <en|vi>`: override auto-detection (README + `OMC_LOCALE`)
 
 ## Relationship to existing OMC skills
@@ -128,7 +131,7 @@ Available flags:
 
 - 5 skills: `vibecodekit-hybrid` + 4 sub-skills (`-scan`, `-rri`, `-vision`, `-verify`)
 - 1 agent: `rri-interviewer` (5 personas × 3 modes)
-- 11 templates: scan-report, tip, completion-report, blueprint, verify-report, 7 vision patterns
+- 14 templates: scan-report, tip, completion-report, blueprint, verify-report, 10 vision patterns (incl. the 3 Phase 4b additions: mobile-app, cli-tool, data-pipeline)
 - Keyword detector integration: `vibecodekit`, `vibecodekit-hybrid`, `vibecode-master`
 - Docs: this file + README sections
 
@@ -172,7 +175,7 @@ Available flags:
 - **CLI surface** `omc vibecodekit` (Node, Commander-based) with four subcommands:
   - `scaffold <slug> [--locale en|vi]` — creates the canonical `.omc/{research,specs,plans,design,verify}/` skeleton and seeds `.omc/deliverables.json`.
   - `status [<slug>]` — reads and pretty-prints the current release gate from `.omc/deliverables.json`.
-  - `patterns` — lists the 7 vision patterns bundled under `templates/vibecodekit-hybrid/vision-patterns/`.
+  - `patterns` — lists the 10 vision patterns bundled under `templates/vibecodekit-hybrid/vision-patterns/`.
   - `locales` — lists available locale overlays under `locale/`.
   - `help` — usage (default when no subcommand is provided).
 - **Marketplace preset entry** under `.claude-plugin/marketplace.json`. The plugin tags are extended with `vibecodekit`, `rri`, `vietnamese`; a new `presets` block advertises `vibecodekit-hybrid` with its entry skill, docs pointer, CLI surface, bundled skills, agents, and templates directory.
@@ -262,6 +265,32 @@ export OMC_LOCALE=vi
 omc vibecodekit status
 # →   locale_signal    : omc-locale-json (resolved=vi)
 ```
+
+## What Phase 4b delivers (this PR)
+
+Phase 4b expands the Vision-stage pattern library from 7 to 10 canonical patterns. No runtime change — pure templates + skill metadata + tests + docs.
+
+- `templates/vibecodekit-hybrid/vision-patterns/mobile-app.md` — native / cross-platform mobile app pattern. Emphasises offline-tolerant state, one-handed reach, platform conventions, crash + OTA update story. Default stack: React Native (Expo) or Flutter + MMKV/SQLite + TanStack Query.
+- `templates/vibecodekit-hybrid/vision-patterns/cli-tool.md` — pipe-first command-line tool pattern. Stable exit codes, `--json` / `--quiet` / `--verbose`, `NO_COLOR` respect, XDG config, shell completion, `isatty(stdout)` awareness. Default stack: Go (single static binary) or Rust (clap + anyhow).
+- `templates/vibecodekit-hybrid/vision-patterns/data-pipeline.md` — batch / streaming data pipeline pattern. Idempotent tasks, raw/curated zones, DQ gates, DLQ, schema-drift alarms, backfill runbook. Default stack: Airflow / Prefect / Dagster + dbt / Spark + Iceberg/Delta.
+- `skills/vibecodekit-hybrid-vision/SKILL.md` — argument-hint + description upgraded to list all 10 patterns; pattern-inference hints (mobile → `mobile-app`, DAG → `data-pipeline`, subcommand → `cli-tool`) added to the Execution Policy.
+- `src/cli/vibecodekit.ts` — help text now says "10 vision patterns".
+- `src/__tests__/vibecodekit-vision-patterns.test.ts` — 30 tests asserting each of the 3 new patterns has the same section spine as the existing 7 (Structural signature / Canonical layout / Default tech stack / Non-goals / Persona focus / Flow Physics / Acceptance skeleton) + domain smoke checks (mobile-app mentions offline, cli-tool mentions exit codes + JSON, data-pipeline mentions idempotency + DLQ).
+- `src/cli/__tests__/vibecodekit.test.ts` — new assertion block proving `omc vibecodekit patterns` lists `mobile-app` / `cli-tool` / `data-pipeline`.
+
+Pattern-inference cheat sheet:
+
+| Signal | Pattern |
+|--------|---------|
+| iOS / Android / React Native / Flutter / "app" | `mobile-app` |
+| `--help` / subcommands / stdin pipe | `cli-tool` |
+| DAG / Airflow / dbt / Kafka / ETL | `data-pipeline` |
+| Plugin inside host app | `enterprise-module` |
+| Authenticated + billing | `saas` |
+| Analytics console | `dashboard` |
+| Public long-form content | `blog` |
+| Personal showcase | `portfolio` |
+| Marketing site | `landing` |
 
 ## What Phase 4a delivers (this PR)
 

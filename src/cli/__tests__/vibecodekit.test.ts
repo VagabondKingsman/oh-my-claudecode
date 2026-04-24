@@ -66,6 +66,14 @@ describe('omc vibecodekit CLI', () => {
     expect(result.stdout).toContain('custom');
   });
 
+  it('lists the Phase 4b vision patterns (mobile-app, cli-tool, data-pipeline)', () => {
+    const result = runCli(['vibecodekit', 'patterns'], workDir);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('mobile-app');
+    expect(result.stdout).toContain('cli-tool');
+    expect(result.stdout).toContain('data-pipeline');
+  });
+
   it('lists available locales including vi overlay', () => {
     const result = runCli(['vibecodekit', 'locales'], workDir);
     expect(result.status).toBe(0);

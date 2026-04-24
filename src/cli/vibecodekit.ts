@@ -34,7 +34,7 @@ Subcommands:
               --locale vi mirrors Vietnamese overlays from locale/vi/ too.
   status      Read .omc/deliverables.json and print the current release gate.
               If <slug> is given, only that slug's gate is printed.
-  patterns    List the 7 vision patterns available under templates/vibecodekit-hybrid/vision-patterns/.
+  patterns    List the 10 vision patterns available under templates/vibecodekit-hybrid/vision-patterns/.
   locales     List available locale overlays under locale/.
 
 Notes:
