@@ -269,6 +269,13 @@ Phase 3 adds a thin CLI surface, a marketplace preset entry, worked examples, an
 - PDF-export Unicode fixtures at [`templates/vibecodekit-hybrid/fixtures/pdf-unicode/`](./templates/vibecodekit-hybrid/fixtures/pdf-unicode/) wired into the RRI-T Vietnamese rubric.
 - Marketplace preset entry at [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json) under `plugins[0].presets[]`.
 
+Phase 4f promotes vibecodekit from skill-pack to **first-class runtime citizen** (opt-in, no preset change):
+
+- **HUD release-gate element** — add `"vibecodekitGate": true` under `omcHud.elements` in `.claude/omc.jsonc` to surface the current gate directly on the statusline (`🟢 VK:SHIP 36P`, `🟡 VK:FOLLOWUPS 2⚠`, `🔴 VK:DO_NOT_SHIP 3❌`). The reader is schema-safe and mirrors the contract used by the ralph / autopilot / prd HUD readers.
+- **Runtime locale resolver** [`src/lib/vibecodekit-locale.ts`](./src/lib/vibecodekit-locale.ts) — one deterministic signal ladder shared by the HUD and the CLI (`.omc/locale.json` → `OMC_LOCALE` → default). POSIX locales normalise (`vi_VN.UTF-8 → vi`); unsupported locales fall through rather than silently changing behaviour.
+- **CLI** — `omc vibecodekit status` now prints `locale_signal` alongside the gate so the CLI output matches what the HUD sees.
+- **Tests** — 24 new unit tests; total suite passes at 8 434 tests / 8 skipped.
+
 Vietnamese docs: [`locale/vi/VIBECODEKIT-HYBRID.vi.md`](./locale/vi/VIBECODEKIT-HYBRID.vi.md), locale overview: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md), migration guide: [`docs/VIBECODEKIT-MIGRATION.md`](./docs/VIBECODEKIT-MIGRATION.md).
 
 ### Intelligent Orchestration

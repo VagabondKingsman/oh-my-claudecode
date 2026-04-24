@@ -181,12 +181,65 @@ omc vibecodekit locales
 | 5 | `manifest-heuristic` | `package.json` / `pyproject.toml` / `Cargo.toml` | Dấu tiếng Việt trong description / author / keywords |
 | 6 | `default` | — | Tiếng Anh |
 
+## Phase 4f đã bàn giao (PR này)
+
+Phase 4f lần đầu tiên đưa hai trạng thái của vibecodekit vào **runtime TypeScript của OMC** (không còn chỉ là skill), nhưng vẫn opt-in nên không phá vỡ preset HUD hiện tại:
+
+- **Locale resolver runtime** `src/lib/vibecodekit-locale.ts` — xuất `resolveVibecodekitLocale(cwd?, env?)` và `getVibecodekitLocale()`. Thang tín hiệu runtime hẹp hơn SCAN (runtime không được làm heuristic filesystem mỗi lần render):
+  1. `.omc/locale.json` ghi đè tường minh
+  2. Biến môi trường `OMC_LOCALE`
+  3. Mặc định (`en`)
+
+  Locale hỗ trợ được chuẩn hoá từ dạng POSIX (ví dụ `vi_VN.UTF-8 → vi`). Locale không được hỗ trợ sẽ rớt xuống tín hiệu kế — không bao giờ đổi hành vi ngấm ngầm.
+- **Reader release-gate cho HUD** `src/hud/omc-state.ts :: readVibecodekitGateForHud(cwd)` — đọc `.omc/deliverables.json` an toàn (JSON hỏng, thiếu trường, số âm → `null` hoặc 0, không bao giờ throw). Đi theo đúng hợp đồng của `readAutopilotStateForHud` / `readPrdStateForHud`.
+- **Phần tử HUD** `src/hud/elements/vibecodekit-gate.ts` — opt-in, hiển thị release gate ngay trên statusline:
+
+  | Verdict | Định dạng |
+  |---------|-----------|
+  | `SHIP` | `🟢 VK:SHIP 36P` |
+  | `SHIP_WITH_FOLLOWUPS` | `🟡 VK:FOLLOWUPS 2⚠` |
+  | `DO_NOT_SHIP` | `🔴 VK:DO_NOT_SHIP 3❌` |
+
+  Phần tử này **tắt mặc định** (`elements.vibecodekitGate = false / undefined`) nên preset HUD hiện tại không đổi. Bật bằng cách thêm `"vibecodekitGate": true` vào `omcHud.elements` trong `.claude/omc.jsonc`.
+- **CLI `status` bổ sung** — `omc vibecodekit status` giờ thêm dòng `locale_signal` cho biết runtime lấy locale từ tín hiệu nào, khớp đúng với cái HUD thấy.
+- **Test** — 24 unit test mới (9 cho resolver, 7 cho reader, 8 cho HUD element), pass toàn bộ trên Node 20 / vitest.
+
+### Bật HUD element
+
+```jsonc
+// .claude/omc.jsonc
+{
+  "omcHud": {
+    "elements": {
+      "vibecodekitGate": true
+    }
+  }
+}
+```
+
+### Ghi đè locale ở runtime
+
+```bash
+# Ghi đè bền vững cho project (giữ qua nhiều phiên + CI)
+echo '{ "locale": "vi" }' > .omc/locale.json
+
+# Ghi đè tạm cho một shell
+export OMC_LOCALE=vi
+
+# Kiểm tra runtime đang thấy gì
+omc vibecodekit status
+# →   locale_signal    : omc-locale-json (resolved=vi)
+```
+
 ## Ngoài phạm vi (để cho phase sau)
 
-- Publish `.omc/deliverables.json` thành GitHub Check Run.
+Phase 4f dừng ở lớp HUD read-only + locale resolver. Phase sau có thể:
+
+- Publish `.omc/deliverables.json` thành GitHub Check Run (ứng cử 4a).
 - Tách persona bank tiếng Việt thành skill plugin độc lập để preset khác dùng lại.
+- Thêm hook chặn `git push` khi gate là 🔴 (opt-in).
 - Dashboard web hiển thị release gate.
 
 ## Credit
 
-Phỏng theo Vibecodekit v5.0 (Contractor–Worker Protocol) và bộ phương pháp RRI (RRI, RRI-T, RRI-UI, RRI-UX) của Nguyễn (VagabondKingsman). Tích hợp dưới dạng skill-pack, **không** sửa runtime OMC.
+Phỏng theo Vibecodekit v5.0 (Contractor–Worker Protocol) và bộ phương pháp RRI (RRI, RRI-T, RRI-UI, RRI-UX) của Nguyễn (VagabondKingsman). Tích hợp dưới dạng skill-pack qua Phase 1–3; Phase 4f là lần đầu tiên có code TypeScript runtime (và vẫn opt-in).

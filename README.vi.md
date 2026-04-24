@@ -189,6 +189,13 @@ Phase 3 bổ sung CLI, preset marketplace, ví dụ đầy đủ, auto-detect lo
 - Fixture PDF Unicode cho RRI-T tại [`templates/vibecodekit-hybrid/fixtures/pdf-unicode/`](./templates/vibecodekit-hybrid/fixtures/pdf-unicode/).
 - Entry preset marketplace tại [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json) trong `plugins[0].presets[]`.
 
+Phase 4f đưa vibecodekit vào **runtime TypeScript của OMC** (opt-in, không đổi preset hiện tại):
+
+- **Phần tử HUD release-gate** — bật bằng `"vibecodekitGate": true` dưới `omcHud.elements` trong `.claude/omc.jsonc`. Statusline hiển thị gate hiện tại: `🟢 VK:SHIP 36P`, `🟡 VK:FOLLOWUPS 2⚠`, `🔴 VK:DO_NOT_SHIP 3❌`. Reader dùng cùng hợp đồng an-toàn-schema như ralph / autopilot / prd.
+- **Locale resolver runtime** [`src/lib/vibecodekit-locale.ts`](./src/lib/vibecodekit-locale.ts) — một thang tín hiệu xác định dùng chung giữa HUD và CLI (`.omc/locale.json` → `OMC_LOCALE` → mặc định). POSIX locale được chuẩn hoá (`vi_VN.UTF-8 → vi`); locale không hỗ trợ sẽ rớt xuống thay vì đổi hành vi ngấm ngầm.
+- **CLI** — `omc vibecodekit status` giờ in thêm dòng `locale_signal`, khớp đúng cái HUD thấy.
+- **Test** — 24 unit test mới; toàn bộ bộ test pass ở 8 434 test / 8 skipped.
+
 Tài liệu tiếng Anh: [`docs/VIBECODEKIT-HYBRID.md`](./docs/VIBECODEKIT-HYBRID.md). Migration guide: [`docs/VIBECODEKIT-MIGRATION.md`](./docs/VIBECODEKIT-MIGRATION.md). Overview locale: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md).
 
 ### Điều phối thông minh

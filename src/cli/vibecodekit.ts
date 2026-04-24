@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 
 import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import chalk from 'chalk';
+import { resolveVibecodekitLocale } from '../lib/vibecodekit-locale.js';
 
 /**
  * `omc vibecodekit` — thin CLI surface for the vibecodekit-hybrid preset.
@@ -266,8 +267,11 @@ function statusCommand(args: readonly string[]): number {
       missing: 0,
     };
 
+  const resolution = resolveVibecodekitLocale(cwd);
+
   console.log(chalk.bold(`vibecodekit-hybrid status — ${slug || '(no slug)'}`));
   console.log(`  locale           : ${parsed.locale ?? 'en'}`);
+  console.log(`  locale_signal    : ${resolution.signal} (resolved=${resolution.locale})`);
   console.log(`  verify_gate      : ${gate}`);
   console.log(`  release_decision : ${decision}`);
   console.log(

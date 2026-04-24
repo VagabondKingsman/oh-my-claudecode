@@ -317,6 +317,129 @@ export function readAutopilotStateForHud(directory: string, sessionId?: string):
 }
 
 // ============================================================================
+// Vibecodekit Hybrid Release Gate
+// ============================================================================
+
+interface VibecodekitDeliverablesFile {
+  slug?: string;
+  verify_gate?: string;
+  verdict_counts?: {
+    pass?: number;
+    fail?: number;
+    painful?: number;
+    missing?: number;
+  };
+  release_decision?: string;
+  rri_t_gate?: string | null;
+  rri_ux_gate?: string | null;
+  rri_ui_gate?: string | null;
+  locale?: string;
+}
+
+/**
+ * Canonical gate glyphs written by `vibecodekit-hybrid-verify`.
+ * Anything else → treat as unknown.
+ */
+export type VibecodekitGateGlyph = '🟢' | '🟡' | '🔴';
+export type VibecodekitReleaseDecision =
+  | 'SHIP'
+  | 'SHIP_WITH_FOLLOWUPS'
+  | 'DO_NOT_SHIP';
+
+export interface VibecodekitGateForHud {
+  slug: string | null;
+  verifyGate: VibecodekitGateGlyph | null;
+  releaseDecision: VibecodekitReleaseDecision | null;
+  verdictCounts: {
+    pass: number;
+    fail: number;
+    painful: number;
+    missing: number;
+  };
+  rriTGate: VibecodekitGateGlyph | null;
+  rriUxGate: VibecodekitGateGlyph | null;
+  rriUiGate: VibecodekitGateGlyph | null;
+}
+
+const GATE_GLYPHS: readonly VibecodekitGateGlyph[] = ['🟢', '🟡', '🔴'];
+const RELEASE_DECISIONS: readonly VibecodekitReleaseDecision[] = [
+  'SHIP',
+  'SHIP_WITH_FOLLOWUPS',
+  'DO_NOT_SHIP',
+];
+
+function normaliseGate(raw: unknown): VibecodekitGateGlyph | null {
+  if (typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  return (GATE_GLYPHS as readonly string[]).includes(trimmed)
+    ? (trimmed as VibecodekitGateGlyph)
+    : null;
+}
+
+function normaliseRelease(raw: unknown): VibecodekitReleaseDecision | null {
+  if (typeof raw !== 'string') return null;
+  const trimmed = raw.trim().toUpperCase();
+  return (RELEASE_DECISIONS as readonly string[]).includes(trimmed)
+    ? (trimmed as VibecodekitReleaseDecision)
+    : null;
+}
+
+function safeNumber(raw: unknown): number {
+  return typeof raw === 'number' && Number.isFinite(raw) && raw >= 0
+    ? Math.floor(raw)
+    : 0;
+}
+
+/**
+ * Read the vibecodekit release gate from `.omc/deliverables.json`.
+ *
+ * Returns null when the file is absent, unparseable, or when it contains
+ * no usable gate signal. This matches the behaviour of the other HUD
+ * state readers (ralph, autopilot, prd) — HUD code never throws.
+ */
+export function readVibecodekitGateForHud(directory: string): VibecodekitGateForHud | null {
+  const omcRoot = getOmcRoot(directory);
+  const deliverablesFile = join(omcRoot, 'deliverables.json');
+
+  if (!existsSync(deliverablesFile)) {
+    return null;
+  }
+
+  let parsed: VibecodekitDeliverablesFile;
+  try {
+    const content = readFileSync(deliverablesFile, 'utf-8');
+    parsed = JSON.parse(content) as VibecodekitDeliverablesFile;
+  } catch {
+    return null;
+  }
+
+  const verifyGate = normaliseGate(parsed.verify_gate);
+  const releaseDecision = normaliseRelease(parsed.release_decision);
+
+  // Nothing meaningful to render — bail out.
+  if (!verifyGate && !releaseDecision) {
+    return null;
+  }
+
+  const vc = parsed.verdict_counts ?? {};
+
+  return {
+    slug: typeof parsed.slug === 'string' && parsed.slug.trim() ? parsed.slug.trim() : null,
+    verifyGate,
+    releaseDecision,
+    verdictCounts: {
+      pass: safeNumber(vc.pass),
+      fail: safeNumber(vc.fail),
+      painful: safeNumber(vc.painful),
+      missing: safeNumber(vc.missing),
+    },
+    rriTGate: normaliseGate(parsed.rri_t_gate),
+    rriUxGate: normaliseGate(parsed.rri_ux_gate),
+    rriUiGate: normaliseGate(parsed.rri_ui_gate),
+  };
+}
+
+// ============================================================================
 // Combined State Check
 // ============================================================================
 
