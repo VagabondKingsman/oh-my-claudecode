@@ -75,6 +75,9 @@ export interface PluginConfig {
         documentSpecialist?: {
             model?: string;
         };
+        rriInterviewer?: {
+            model?: string;
+        };
     };
     features?: {
         parallelExecution?: boolean;
@@ -372,7 +375,7 @@ export type TeamRoleProvider = 'claude' | 'codex' | 'gemini';
 /** Tier name accepted in role-assignment `model` field. */
 export type TeamRoleTier = 'HIGH' | 'MEDIUM' | 'LOW';
 /** Known agent names derived from `buildDefaultConfig().agents` keys in src/config/loader.ts. */
-export declare const KNOWN_AGENT_NAMES: readonly ["omc", "explore", "analyst", "planner", "architect", "debugger", "executor", "verifier", "securityReviewer", "codeReviewer", "testEngineer", "designer", "writer", "qaTester", "scientist", "tracer", "gitMaster", "codeSimplifier", "critic", "documentSpecialist"];
+export declare const KNOWN_AGENT_NAMES: readonly ["omc", "explore", "analyst", "planner", "architect", "debugger", "executor", "verifier", "securityReviewer", "codeReviewer", "testEngineer", "designer", "writer", "qaTester", "scientist", "tracer", "gitMaster", "codeSimplifier", "critic", "documentSpecialist", "rriInterviewer"];
 export type KnownAgentName = typeof KNOWN_AGENT_NAMES[number];
 /** User-facing per-role spec in `team.roleRouting`. */
 export interface TeamRoleAssignmentSpec {

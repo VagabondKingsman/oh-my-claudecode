@@ -73,6 +73,21 @@ describe('keyword-detector.mjs mode-message dispatch', () => {
     expect(context).toContain('name: ralplan');
   });
 
+  it('emits vibecodekit-hybrid invocation on vibecodekit keyword', () => {
+    const output = runKeywordDetector('vibecodekit build me a SaaS');
+    const context = output.hookSpecificOutput?.additionalContext ?? '';
+
+    expect(context).toContain('[MAGIC KEYWORD: VIBECODEKIT-HYBRID]');
+    expect(context).toContain('name: vibecodekit-hybrid');
+  });
+
+  it('emits vibecodekit-hybrid invocation on vibecodekit-hybrid alias', () => {
+    const output = runKeywordDetector('please run vibecodekit-hybrid on this repo');
+    const context = output.hookSpecificOutput?.additionalContext ?? '';
+
+    expect(context).toContain('[MAGIC KEYWORD: VIBECODEKIT-HYBRID]');
+  });
+
   it('does not emit or activate ralplan for informational/question mentions', () => {
     const cwd = mkdtempSync(join(tmpdir(), 'keyword-detector-ralplan-info-'));
     const sessionId = 'session-2619-info';

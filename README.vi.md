@@ -158,6 +158,18 @@ Nhiều chiến lược cho nhiều tình huống — từ điều phối dựa 
 | **Ralph** | Chế độ bền bỉ với vòng lặp verify/fix | Tác vụ bắt buộc hoàn tất đầy đủ (không có hoàn thành một phần âm thầm) |
 | **Pipeline** | Xử lý tuần tự theo giai đoạn | Biến đổi nhiều bước cần thứ tự nghiêm ngặt |
 | **Swarm / Ultrapilot (cũ)** | Lớp tương thích chuyển sang **Team** | Quy trình hiện có và tài liệu cũ |
+| **Vibecodekit Hybrid** | Pipeline Chủ thầu–Thợ (SCAN → RRI → VISION → BLUEPRINT → BUILD → VERIFY → REFINE) | Dự án mơ hồ cần phỏng vấn theo persona, bản vẽ (Blueprint) được duyệt, và verdict 4 mức |
+
+### Preset Vibecodekit Hybrid
+
+Kết hợp [phương pháp Chủ thầu–Thợ của Vibecodekit v5](./locale/vi/VIBECODEKIT-HYBRID.vi.md) với runtime OMC: 5 persona RRI × 3 chế độ phỏng vấn, 7 vision pattern (landing / saas / dashboard / blog / portfolio / enterprise-module / custom), verdict 4 mức (PASS / FAIL / PAINFUL / MISSING), template TIP & Completion Report chuẩn hoá.
+
+```
+vibecodekit build me một landing page cho X
+/oh-my-claudecode:vibecodekit-hybrid --pattern saas --locale vi
+```
+
+Tài liệu tiếng Anh: [`docs/VIBECODEKIT-HYBRID.md`](./docs/VIBECODEKIT-HYBRID.md).
 
 ### Điều phối thông minh
 

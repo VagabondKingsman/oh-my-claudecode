@@ -44,5 +44,6 @@ export const KNOWN_AGENT_NAMES = [
     'codeSimplifier',
     'critic',
     'documentSpecialist',
+    'rriInterviewer',
 ];
 //# sourceMappingURL=types.js.map

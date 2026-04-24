@@ -20,6 +20,7 @@ export { qaTesterAgent } from './qa-tester.js';
 export { scientistAgent } from './scientist.js';
 export { exploreAgent } from './explore.js';
 export { tracerAgent } from './tracer.js';
+export { rriInterviewerAgent } from './rri-interviewer.js';
 export { documentSpecialistAgent } from './document-specialist.js';
 export { loadAgentPrompt };
 /**

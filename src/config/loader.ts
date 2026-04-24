@@ -64,6 +64,7 @@ export function buildDefaultConfig(): PluginConfig {
       codeSimplifier: { model: defaultTierModels.HIGH },
       critic: { model: defaultTierModels.HIGH },
       documentSpecialist: { model: defaultTierModels.MEDIUM },
+      rriInterviewer: { model: defaultTierModels.MEDIUM },
     },
     features: {
       parallelExecution: true,
@@ -825,6 +826,10 @@ export function generateConfigSchema(): object {
             properties: { model: { type: "string" } },
           },
           documentSpecialist: {
+            type: "object",
+            properties: { model: { type: "string" } },
+          },
+          rriInterviewer: {
             type: "object",
             properties: { model: { type: "string" } },
           },

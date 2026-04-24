@@ -238,6 +238,18 @@ Multiple strategies for different use cases — from Team-backed orchestration t
 | **Ralph**               | Persistent mode with verify/fix loops                                                   | Tasks that must complete fully (no silent partials)    |
 | **Pipeline**            | Sequential, staged processing                                                           | Multi-step transformations with strict ordering        |
 | **Ultrapilot (legacy)** | Deprecated compatibility mode (autopilot pipeline alias)                                | Existing workflows and older docs                      |
+| **Vibecodekit Hybrid**  | Contractor–Worker pipeline (SCAN → RRI → VISION → BLUEPRINT → BUILD → VERIFY → REFINE) | Ambiguous projects that need a persona-driven interview, a reviewable Blueprint, and a 4-level verdict |
+
+### Vibecodekit Hybrid preset
+
+Combines the [Vibecodekit v5 Contractor–Worker methodology](./docs/VIBECODEKIT-HYBRID.md) with OMC's runtime: 5 RRI personas × 3 interview modes, 7 vision patterns (landing / saas / dashboard / blog / portfolio / enterprise-module / custom), 4-level verify verdict (PASS / FAIL / PAINFUL / MISSING), and standardized TIP / Completion Report artifacts.
+
+```
+vibecodekit build me a landing page for X
+/oh-my-claudecode:vibecodekit-hybrid --pattern saas --locale vi
+```
+
+Vietnamese docs: [`locale/vi/VIBECODEKIT-HYBRID.vi.md`](./locale/vi/VIBECODEKIT-HYBRID.vi.md).
 
 ### Intelligent Orchestration
 
