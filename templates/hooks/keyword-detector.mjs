@@ -661,7 +661,7 @@ function resolveConflicts(matches) {
 
   // Sort by priority order
   const priorityOrder = ['cancel','ralph','autopilot','ultrawork',
-    'ccg','ralplan','deep-interview','ai-slop-cleaner','tdd','code-review','security-review','ultrathink','deepsearch','analyze'];
+    'ccg','ralplan','deep-interview','vibecodekit-hybrid','ai-slop-cleaner','tdd','code-review','security-review','ultrathink','deepsearch','analyze'];
   resolved.sort((a, b) => priorityOrder.indexOf(a.name) - priorityOrder.indexOf(b.name));
 
   return resolved;
@@ -824,6 +824,11 @@ async function main() {
     // Analyze keywords
     if (hasActionableKeyword(cleanPrompt, /\b(deep[\s-]?analyze|deepanalyze)\b|(딥\s?분석)/i)) {
       matches.push({ name: 'analyze', args: '' });
+    }
+
+    // Vibecodekit Hybrid keywords (Vibecodekit v5 contractor-worker pipeline)
+    if (hasActionableKeyword(cleanPrompt, /\b(vibecodekit(?:[-\s]hybrid)?|vibecode[-\s]?master)\b/i)) {
+      matches.push({ name: 'vibecodekit-hybrid', args: '' });
     }
 
     // No matches - pass through

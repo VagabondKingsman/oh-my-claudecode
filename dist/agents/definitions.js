@@ -22,6 +22,7 @@ export { qaTesterAgent } from './qa-tester.js';
 export { scientistAgent } from './scientist.js';
 export { exploreAgent } from './explore.js';
 export { tracerAgent } from './tracer.js';
+export { rriInterviewerAgent } from './rri-interviewer.js';
 export { documentSpecialistAgent } from './document-specialist.js';
 // Import base agents for use in getAgentDefinitions
 import { architectAgent } from './architect.js';
@@ -35,6 +36,7 @@ import { qaTesterAgent } from './qa-tester.js';
 import { scientistAgent } from './scientist.js';
 import { exploreAgent } from './explore.js';
 import { tracerAgent } from './tracer.js';
+import { rriInterviewerAgent } from './rri-interviewer.js';
 import { documentSpecialistAgent } from './document-specialist.js';
 // Re-export loadAgentPrompt (also exported from index.ts)
 export { loadAgentPrompt };
@@ -148,6 +150,7 @@ const AGENT_CONFIG_KEY_MAP = {
     'code-simplifier': 'codeSimplifier',
     critic: 'critic',
     'document-specialist': 'documentSpecialist',
+    'rri-interviewer': 'rriInterviewer',
 };
 function getConfiguredAgentModel(name, config) {
     const key = AGENT_CONFIG_KEY_MAP[name];
@@ -201,6 +204,7 @@ export function getAgentDefinitions(options) {
         tracer: tracerAgent,
         'git-master': gitMasterAgent,
         'code-simplifier': codeSimplifierAgent,
+        'rri-interviewer': rriInterviewerAgent,
         // ============================================================
         // COORDINATION
         // ============================================================

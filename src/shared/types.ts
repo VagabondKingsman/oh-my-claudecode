@@ -39,6 +39,7 @@ export interface PluginConfig {
     codeSimplifier?: { model?: string };
     critic?: { model?: string };
     documentSpecialist?: { model?: string };
+    rriInterviewer?: { model?: string };
   };
 
   // Feature toggles
@@ -435,6 +436,7 @@ export const KNOWN_AGENT_NAMES = [
   'codeSimplifier',
   'critic',
   'documentSpecialist',
+  'rriInterviewer',
 ] as const;
 
 export type KnownAgentName = typeof KNOWN_AGENT_NAMES[number];

@@ -21,6 +21,7 @@
  * 12. ultrathink: Extended reasoning
  * 13. deepsearch: Codebase search (restricted patterns)
  * 14. analyze: Analysis mode (restricted patterns)
+ * 15. vibecodekit / vibecode: Contractor-worker pipeline (Vibecodekit v5 hybrid)
  */
 
 import { writeFileSync, readFileSync, mkdirSync, existsSync, unlinkSync } from 'fs';
@@ -767,7 +768,7 @@ function resolveConflicts(matches) {
 
   // Sort by priority order
   const priorityOrder = ['cancel','ralph','autopilot','ultrawork',
-    'ccg','ralplan','deep-interview','ai-slop-cleaner','tdd','code-review','security-review','ultrathink','deepsearch','analyze'];
+    'ccg','ralplan','deep-interview','vibecodekit-hybrid','ai-slop-cleaner','tdd','code-review','security-review','ultrathink','deepsearch','analyze'];
   resolved.sort((a, b) => priorityOrder.indexOf(a.name) - priorityOrder.indexOf(b.name));
 
   return resolved;
@@ -929,6 +930,12 @@ async function main() {
     // Wiki keywords
     if (hasActionableKeyword(cleanPrompt, /\b(wiki(?:\s+(?:this|add|lint|query))?)\b/i)) {
       matches.push({ name: 'wiki', args: '' });
+    }
+
+    // Vibecodekit Hybrid keywords (Vibecodekit v5 contractor-worker pipeline)
+    // Use word-boundary to avoid matching "vibe coder" / "my vibes" etc.
+    if (hasActionableKeyword(cleanPrompt, /\b(vibecodekit(?:[-\s]hybrid)?|vibecode[-\s]?master)\b/i)) {
+      matches.push({ name: 'vibecodekit-hybrid', args: '' });
     }
 
     // No matches - pass through

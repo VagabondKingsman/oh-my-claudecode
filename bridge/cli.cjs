@@ -3100,7 +3100,8 @@ var init_types = __esm({
       "gitMaster",
       "codeSimplifier",
       "critic",
-      "documentSpecialist"
+      "documentSpecialist",
+      "rriInterviewer"
     ];
   }
 });
@@ -3687,7 +3688,8 @@ function buildDefaultConfig() {
       gitMaster: { model: defaultTierModels.MEDIUM },
       codeSimplifier: { model: defaultTierModels.HIGH },
       critic: { model: defaultTierModels.HIGH },
-      documentSpecialist: { model: defaultTierModels.MEDIUM }
+      documentSpecialist: { model: defaultTierModels.MEDIUM },
+      rriInterviewer: { model: defaultTierModels.MEDIUM }
     },
     features: {
       parallelExecution: true,
@@ -4939,6 +4941,43 @@ var init_tracer = __esm({
   }
 });
 
+// src/agents/rri-interviewer.ts
+var RRI_INTERVIEWER_PROMPT_METADATA, rriInterviewerAgent;
+var init_rri_interviewer = __esm({
+  "src/agents/rri-interviewer.ts"() {
+    "use strict";
+    init_utils();
+    RRI_INTERVIEWER_PROMPT_METADATA = {
+      category: "specialist",
+      cost: "CHEAP",
+      promptAlias: "RRIInterviewer",
+      triggers: [
+        { domain: "Requirements", trigger: "Reverse Requirements Interview (5 personas \xD7 3 modes)" },
+        { domain: "Discovery", trigger: "Structured persona-driven project kickoff" },
+        { domain: "Vibecodekit", trigger: "RRI stage of the vibecodekit-hybrid pipeline" }
+      ],
+      useWhen: [
+        "Kickoff for a new or existing project that needs requirements before BUILD",
+        "User invoked the vibecodekit-hybrid skill or the vibecodekit keyword",
+        "A SCAN report exists and a 5-persona interview is the next stage"
+      ],
+      avoidWhen: [
+        "User wants a generic Socratic interview (use deep-interview)",
+        "No SCAN report exists yet (run vibecodekit-hybrid-scan first)",
+        "Task is implementation \u2014 interview stage is complete"
+      ]
+    };
+    rriInterviewerAgent = {
+      name: "rri-interviewer",
+      description: "Reverse Requirements Interview specialist (Sonnet). Runs a structured 5-persona \xD7 3-mode interview, consumes the SCAN report to skip auto-answered questions, and produces a Requirements Matrix + Decisions Log + Open Questions artifact for the vibecodekit-hybrid pipeline.",
+      prompt: loadAgentPrompt("rri-interviewer"),
+      model: "sonnet",
+      defaultModel: "sonnet",
+      metadata: RRI_INTERVIEWER_PROMPT_METADATA
+    };
+  }
+});
+
 // src/agents/document-specialist.ts
 var DOCUMENT_SPECIALIST_PROMPT_METADATA, documentSpecialistAgent;
 var init_document_specialist = __esm({
@@ -5036,6 +5075,7 @@ function getAgentDefinitions(options) {
     tracer: tracerAgent,
     "git-master": gitMasterAgent,
     "code-simplifier": codeSimplifierAgent,
+    "rri-interviewer": rriInterviewerAgent,
     // ============================================================
     // COORDINATION
     // ============================================================
@@ -5086,6 +5126,7 @@ var init_definitions = __esm({
     init_scientist();
     init_explore();
     init_tracer();
+    init_rri_interviewer();
     init_document_specialist();
     init_architect();
     init_designer();
@@ -5098,6 +5139,7 @@ var init_definitions = __esm({
     init_scientist();
     init_explore();
     init_tracer();
+    init_rri_interviewer();
     init_document_specialist();
     debuggerAgent = {
       name: "debugger",
@@ -5167,7 +5209,8 @@ var init_definitions = __esm({
       "git-master": "gitMaster",
       "code-simplifier": "codeSimplifier",
       critic: "critic",
-      "document-specialist": "documentSpecialist"
+      "document-specialist": "documentSpecialist",
+      "rri-interviewer": "rriInterviewer"
     };
     omcSystemPrompt = `You are the relentless orchestrator of a multi-agent development system.
 
@@ -80869,6 +80912,7 @@ init_planner();
 init_qa_tester();
 init_scientist();
 init_tracer();
+init_rri_interviewer();
 init_document_specialist();
 init_definitions();
 init_definitions();
