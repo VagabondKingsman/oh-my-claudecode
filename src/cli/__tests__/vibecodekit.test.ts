@@ -8,7 +8,7 @@
  *   - patterns lists vision patterns
  *   - locales lists available overlay languages
  */
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { execFileSync } from 'child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
@@ -18,6 +18,18 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_ROOT = join(__dirname, '../../..');
 const CLI_ENTRY = join(PLUGIN_ROOT, 'bridge/cli.cjs');
+
+// CI's `test` job does not run `npm run build` first, so the CLI bridge may be
+// missing when vitest starts. Build it once here so the subprocess tests work
+// in both local and CI environments. Safe for local: noop when the file exists.
+beforeAll(() => {
+  if (existsSync(CLI_ENTRY)) return;
+  execFileSync('node', [join(PLUGIN_ROOT, 'scripts/build-cli.mjs')], {
+    cwd: PLUGIN_ROOT,
+    stdio: 'inherit',
+    timeout: 120_000,
+  });
+}, 180_000);
 
 function runCli(args: string[], cwd: string): { stdout: string; stderr: string; status: number } {
   try {
