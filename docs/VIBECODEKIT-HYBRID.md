@@ -211,14 +211,67 @@ The CLI only manages on-disk state — the actual pipeline still runs inside a C
 | 5 | `manifest-heuristic` | `package.json` / `pyproject.toml` / `Cargo.toml` | Vietnamese diacritic in description / author / keywords |
 | 6 | `default` | — | English |
 
+## What Phase 4f delivers (this PR)
+
+Phase 4f promotes two pieces of state from "skill-only" to **first-class runtime citizens** of the OMC TypeScript core, without breaking backward compatibility:
+
+- **Runtime locale resolver** `src/lib/vibecodekit-locale.ts` — exports `resolveVibecodekitLocale(cwd?, env?)` and `getVibecodekitLocale()`. Implements a narrower, deterministic signal ladder than the SCAN-stage one (runtime must never do filesystem heuristics per render):
+  1. `.omc/locale.json` explicit override
+  2. `OMC_LOCALE` env var
+  3. Default (`en`)
+
+  Supported locales normalise POSIX-style forms (e.g. `vi_VN.UTF-8 → vi`). Unsupported locales fall through — they never silently change behaviour.
+- **Release-gate HUD reader** `src/hud/omc-state.ts :: readVibecodekitGateForHud(cwd)` — parses `.omc/deliverables.json` safely (malformed JSON, missing fields, out-of-range counts → `null` or zero, never a throw). Mirrors the contract used by `readAutopilotStateForHud` / `readPrdStateForHud`.
+- **HUD element** `src/hud/elements/vibecodekit-gate.ts` — opt-in element that surfaces the current release gate directly on the statusline:
+
+  | Verdict | Format |
+  |---------|--------|
+  | `SHIP` | `🟢 VK:SHIP 36P` |
+  | `SHIP_WITH_FOLLOWUPS` | `🟡 VK:FOLLOWUPS 2⚠` |
+  | `DO_NOT_SHIP` | `🔴 VK:DO_NOT_SHIP 3❌` |
+
+  The element is *off by default* (`elements.vibecodekitGate = false / undefined`) so existing HUD presets are untouched. Enable it in `.claude/omc.jsonc` by adding `"vibecodekitGate": true` under `omcHud.elements`. The default element order places it right after `prd`.
+- **CLI `status` enhancement** — `omc vibecodekit status` now adds a `locale_signal` line showing which signal the runtime picked (`omc-locale-json` / `env:OMC_LOCALE` / `default`) alongside the resolved locale, so the CLI matches what the HUD sees.
+- **Tests** — 24 new unit tests (9 for the locale resolver, 7 for the gate reader, 8 for the HUD element), all green on Node 20 / vitest.
+
+### Enabling the gate HUD element
+
+```jsonc
+// .claude/omc.jsonc
+{
+  "omcHud": {
+    "elements": {
+      "vibecodekitGate": true
+    }
+  }
+}
+```
+
+Then run the pipeline once so `vibecodekit-hybrid-verify` writes `.omc/deliverables.json`; the HUD picks up the gate on the next render.
+
+### Locale override (runtime)
+
+```bash
+# Persistent per-project override — survives across sessions + CI
+echo '{ "locale": "vi" }' > .omc/locale.json
+
+# One-shot override for this shell
+export OMC_LOCALE=vi
+
+# Verify what the runtime sees
+omc vibecodekit status
+# →   locale_signal    : omc-locale-json (resolved=vi)
+```
+
 ## What is still out of scope
 
-Phase 3 intentionally stops at the CLI + preset + examples + heuristic layer. The runtime itself does not read `OMC_LOCALE` — skills and templates do. A future phase could:
+Phase 4f deliberately stops at the read-only HUD / locale surface. Future phases could:
 
-- Auto-publish `.omc/deliverables.json` as a GitHub Check Run.
-- Convert the Vietnamese persona banks into a Claude skill plugin that other presets can depend on.
+- Auto-publish `.omc/deliverables.json` as a GitHub Check Run (Phase 4a candidate).
+- Convert the Vietnamese persona banks into a standalone Claude skill plugin.
+- Add a hook surface that blocks `git push` when the gate is 🔴 (opt-in).
 - Add a web-dashboard surface for the release gate.
 
 ## Attribution
 
-Adapted from Vibecodekit v5.0 (Contractor–Worker Protocol) and the RRI methodology family (RRI, RRI-T, RRI-UI, RRI-UX) by Nguyễn (VagabondKingsman). Integrated as an OMC skill-pack without modifying the OMC runtime.
+Adapted from Vibecodekit v5.0 (Contractor–Worker Protocol) and the RRI methodology family (RRI, RRI-T, RRI-UI, RRI-UX) by Nguyễn (VagabondKingsman). Integrated as an OMC skill-pack across Phases 1–3; Phase 4f is the first runtime TypeScript integration and is still opt-in.
