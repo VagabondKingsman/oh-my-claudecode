@@ -193,6 +193,14 @@ describe('omc vibecodekit CLI', () => {
     ).toBe(true);
   });
 
+  it('scaffold rejects slugs with no alphanumeric characters after normalization', () => {
+    const result = runCli(['vibecodekit', 'scaffold', '!!!'], workDir);
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('no alphanumeric characters');
+    // No deliverables.json should have been written
+    expect(existsSync(join(workDir, '.omc/deliverables.json'))).toBe(false);
+  });
+
   it('status reports the current gate values', () => {
     runCli(['vibecodekit', 'scaffold', 'saas-v1'], workDir);
     const result = runCli(['vibecodekit', 'status'], workDir);

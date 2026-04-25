@@ -94823,7 +94823,13 @@ function parseScaffoldArgs(args) {
   if (!slugArg) {
     throw new Error("scaffold requires <slug>, e.g. omc vibecodekit scaffold checkout-flow");
   }
-  return { slug: slugify(slugArg), locale };
+  const slug = slugify(slugArg);
+  if (!slug) {
+    throw new Error(
+      `slug '${slugArg}' contains no alphanumeric characters after normalization`
+    );
+  }
+  return { slug, locale };
 }
 function scaffoldCommand(args) {
   let parsed;
