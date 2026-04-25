@@ -94,7 +94,7 @@ function safeNumber(raw) {
  *             decision: 'SHIP'|'SHIP_WITH_FOLLOWUPS'|'DO_NOT_SHIP'|null,
  *             slug: string|null,
  *             counts: { pass: number, fail: number, painful: number, missing: number },
- *             rri: { t: string|null, ux: string|null, ui: string|null } }}
+ *             rri: { t: string|null, ux: string|null, ui: string|null, sec: string|null } }}
  */
 export function evaluateDeliverables(parsed, opts = {}) {
   const strict = opts.strict === true;
@@ -115,7 +115,7 @@ export function evaluateDeliverables(parsed, opts = {}) {
     decision: null,
     slug: null,
     counts: { pass: 0, fail: 0, painful: 0, missing: 0 },
-    rri: { t: null, ux: null, ui: null },
+    rri: { t: null, ux: null, ui: null, sec: null },
   };
 
   if (!parsed || typeof parsed !== 'object') return empty;
