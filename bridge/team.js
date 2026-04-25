@@ -2665,7 +2665,10 @@ var init_types = __esm({
       "codeSimplifier",
       "critic",
       "documentSpecialist",
-      "rriInterviewer"
+      "rriInterviewer",
+      "rriTester",
+      "rriUxCritic",
+      "rriSecurityAuditor"
     ];
   }
 });
@@ -3090,7 +3093,10 @@ function buildDefaultConfig() {
       codeSimplifier: { model: defaultTierModels.HIGH },
       critic: { model: defaultTierModels.HIGH },
       documentSpecialist: { model: defaultTierModels.MEDIUM },
-      rriInterviewer: { model: defaultTierModels.MEDIUM }
+      rriInterviewer: { model: defaultTierModels.MEDIUM },
+      rriTester: { model: defaultTierModels.MEDIUM },
+      rriUxCritic: { model: defaultTierModels.MEDIUM },
+      rriSecurityAuditor: { model: defaultTierModels.MEDIUM }
     },
     features: {
       parallelExecution: true,
@@ -4027,6 +4033,115 @@ var init_rri_interviewer = __esm({
   }
 });
 
+// src/agents/rri-tester.ts
+var RRI_TESTER_PROMPT_METADATA, rriTesterAgent;
+var init_rri_tester = __esm({
+  "src/agents/rri-tester.ts"() {
+    "use strict";
+    init_utils();
+    RRI_TESTER_PROMPT_METADATA = {
+      category: "specialist",
+      cost: "CHEAP",
+      promptAlias: "RRITester",
+      triggers: [
+        { domain: "Testing", trigger: "Adversarial QA walk (5 personas \xD7 7 dimensions \xD7 8 stress axes)" },
+        { domain: "Quality", trigger: "4-level verdict PASS / FAIL / PAINFUL / MISSING with release gate" },
+        { domain: "Vibecodekit", trigger: "RRI-T stage of the vibecodekit-hybrid pipeline" }
+      ],
+      useWhen: [
+        "Build is runnable and needs adversarial coverage before a release decision",
+        "User invoked vibecodekit-hybrid-rri-t or asked for a stress test / adversarial QA",
+        "Existing verifier / ultraqa passes but PAINFUL / MISSING verdicts are suspected"
+      ],
+      avoidWhen: [
+        "Feature is still in RRI / VISION / BLUEPRINT \u2014 there is nothing to stress",
+        "Only a functional spec-vs-build check is needed (use verifier / ultraqa)"
+      ]
+    };
+    rriTesterAgent = {
+      name: "rri-tester",
+      description: "RRI-T specialist (Sonnet). Runs 5 testing personas \xD7 7 dimensions \xD7 8 stress axes, generates Q\u2192A\u2192R\u2192P\u2192T test cases, records a 4-level verdict (PASS / FAIL / PAINFUL / MISSING) per case, computes a Module \xD7 Dimension coverage matrix, and emits a release-gate decision for the vibecodekit-hybrid pipeline.",
+      prompt: loadAgentPrompt("rri-tester"),
+      model: "sonnet",
+      defaultModel: "sonnet",
+      metadata: RRI_TESTER_PROMPT_METADATA
+    };
+  }
+});
+
+// src/agents/rri-ux-critic.ts
+var RRI_UX_CRITIC_PROMPT_METADATA, rriUxCriticAgent;
+var init_rri_ux_critic = __esm({
+  "src/agents/rri-ux-critic.ts"() {
+    "use strict";
+    init_utils();
+    RRI_UX_CRITIC_PROMPT_METADATA = {
+      category: "specialist",
+      cost: "CHEAP",
+      promptAlias: "RRIUXCritic",
+      triggers: [
+        { domain: "UX", trigger: "Flow Physics critique (5 UX personas \xD7 7 dimensions \xD7 8 axes)" },
+        { domain: "Design", trigger: "Pre-code UX review that catches anti-patterns before they ship" },
+        { domain: "Vibecodekit", trigger: "RRI-UX stage of the vibecodekit-hybrid pipeline" }
+      ],
+      useWhen: [
+        "A wireframe, mockup, staging build, or flow description needs UX review before code",
+        "User invoked vibecodekit-hybrid-rri-ux or asked for flow physics / UX audit",
+        "RRI-T flagged a cluster of PAINFUL items that need a UX root-cause diagnosis"
+      ],
+      avoidWhen: [
+        "Project has no UI (backend / CLI) \u2014 use rri-tester for API ergonomics",
+        "Architectural problem rather than UX \u2014 use architect / critic"
+      ]
+    };
+    rriUxCriticAgent = {
+      name: "rri-ux-critic",
+      description: "RRI-UX specialist (Sonnet). Runs 5 UX personas \xD7 7 UX dimensions \xD7 8 Flow Physics axes, produces 80-120 S\u2192V\u2192P\u2192F\u2192I issues per module, scores a UX Coverage Matrix, and emits a release-gate decision with Vietnamese-specific checklist when OMC_LOCALE=vi.",
+      prompt: loadAgentPrompt("rri-ux-critic"),
+      model: "sonnet",
+      defaultModel: "sonnet",
+      metadata: RRI_UX_CRITIC_PROMPT_METADATA
+    };
+  }
+});
+
+// src/agents/rri-security-auditor.ts
+var RRI_SECURITY_AUDITOR_PROMPT_METADATA, rriSecurityAuditorAgent;
+var init_rri_security_auditor = __esm({
+  "src/agents/rri-security-auditor.ts"() {
+    "use strict";
+    init_utils();
+    RRI_SECURITY_AUDITOR_PROMPT_METADATA = {
+      category: "specialist",
+      cost: "CHEAP",
+      promptAlias: "RRISecurityAuditor",
+      triggers: [
+        { domain: "Security", trigger: "Adversarial security walk (5 personas \xD7 8 attack axes)" },
+        { domain: "Compliance", trigger: "Threat-model + control-evidence coverage with 4-level verdict" },
+        { domain: "Vibecodekit", trigger: "RRI-SEC stage of the vibecodekit-hybrid pipeline" }
+      ],
+      useWhen: [
+        "Build handles authn/authz, payments, PII, uploads, or external integrations and needs structured threat coverage before release",
+        'User invoked vibecodekit-hybrid-rri-sec or asked for "rri-sec", "security audit", "threat model"',
+        "security-reviewer pass passes but MISSING / PAINFUL threats are suspected (no rate-limits, no audit trail, etc.)"
+      ],
+      avoidWhen: [
+        "Feature is still in RRI / VISION / BLUEPRINT \u2014 there is nothing concrete to attack",
+        "Only a static-analysis lint pass is needed (use security-reviewer or test-engineer instead)",
+        "User asks for live exploitation against production \u2014 refuse and emit a ticket"
+      ]
+    };
+    rriSecurityAuditorAgent = {
+      name: "rri-security-auditor",
+      description: "RRI-SEC specialist (Sonnet). Runs 5 security personas (Threat Modeler / AppSec / Red Teamer / Compliance Auditor / Privacy Officer) \xD7 8 attack axes (A1 AuthN, A2 AuthZ, A3 Injection, A4 Supply chain, A5 Secret hygiene, A6 Data exfil, A7 DoS/Abuse, A8 Side channel), emits T\u2192A\u2192V\u2192I\u2192M threat cases with a 4-level verdict (PASS / FAIL / PAINFUL / MISSING) per case, computes a Module \xD7 Attack-axis coverage matrix, and emits a release-gate decision for the vibecodekit-hybrid pipeline.",
+      prompt: loadAgentPrompt("rri-security-auditor"),
+      model: "sonnet",
+      defaultModel: "sonnet",
+      metadata: RRI_SECURITY_AUDITOR_PROMPT_METADATA
+    };
+  }
+});
+
 // src/agents/document-specialist.ts
 var DOCUMENT_SPECIALIST_PROMPT_METADATA, documentSpecialistAgent;
 var init_document_specialist = __esm({
@@ -4111,6 +4226,9 @@ var init_definitions = __esm({
     init_explore();
     init_tracer();
     init_rri_interviewer();
+    init_rri_tester();
+    init_rri_ux_critic();
+    init_rri_security_auditor();
     init_document_specialist();
     init_architect();
     init_designer();
@@ -4124,6 +4242,9 @@ var init_definitions = __esm({
     init_explore();
     init_tracer();
     init_rri_interviewer();
+    init_rri_tester();
+    init_rri_ux_critic();
+    init_rri_security_auditor();
     init_document_specialist();
     debuggerAgent = {
       name: "debugger",

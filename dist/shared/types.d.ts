@@ -78,6 +78,12 @@ export interface PluginConfig {
         rriInterviewer?: {
             model?: string;
         };
+        rriTester?: {
+            model?: string;
+        };
+        rriUxCritic?: {
+            model?: string;
+        };
     };
     features?: {
         parallelExecution?: boolean;
@@ -375,7 +381,7 @@ export type TeamRoleProvider = 'claude' | 'codex' | 'gemini';
 /** Tier name accepted in role-assignment `model` field. */
 export type TeamRoleTier = 'HIGH' | 'MEDIUM' | 'LOW';
 /** Known agent names derived from `buildDefaultConfig().agents` keys in src/config/loader.ts. */
-export declare const KNOWN_AGENT_NAMES: readonly ["omc", "explore", "analyst", "planner", "architect", "debugger", "executor", "verifier", "securityReviewer", "codeReviewer", "testEngineer", "designer", "writer", "qaTester", "scientist", "tracer", "gitMaster", "codeSimplifier", "critic", "documentSpecialist", "rriInterviewer"];
+export declare const KNOWN_AGENT_NAMES: readonly ["omc", "explore", "analyst", "planner", "architect", "debugger", "executor", "verifier", "securityReviewer", "codeReviewer", "testEngineer", "designer", "writer", "qaTester", "scientist", "tracer", "gitMaster", "codeSimplifier", "critic", "documentSpecialist", "rriInterviewer", "rriTester", "rriUxCritic"];
 export type KnownAgentName = typeof KNOWN_AGENT_NAMES[number];
 /** User-facing per-role spec in `team.roleRouting`. */
 export interface TeamRoleAssignmentSpec {

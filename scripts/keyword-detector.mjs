@@ -768,8 +768,17 @@ function resolveConflicts(matches) {
 
   // Sort by priority order
   const priorityOrder = ['cancel','ralph','autopilot','ultrawork',
-    'ccg','ralplan','deep-interview','vibecodekit-hybrid','ai-slop-cleaner','tdd','code-review','security-review','ultrathink','deepsearch','analyze'];
+    'ccg','ralplan','deep-interview','vibecodekit-hybrid',
+    'vibecodekit-hybrid-rri-ui','vibecodekit-hybrid-rri-ux','vibecodekit-hybrid-rri-t','vibecodekit-hybrid-rri-sec',
+    'ai-slop-cleaner','tdd','code-review','security-review','ultrathink','deepsearch','analyze'];
   resolved.sort((a, b) => priorityOrder.indexOf(a.name) - priorityOrder.indexOf(b.name));
+
+  // The vibecodekit-hybrid orchestrator already invokes every RRI sub-skill
+  // at the correct stage, so standalone sub-skill matches would cause a
+  // redundant second run. Suppress them when the orchestrator is in play.
+  if (resolved.some(m => m.name === 'vibecodekit-hybrid')) {
+    resolved = resolved.filter(m => !m.name.startsWith('vibecodekit-hybrid-rri-'));
+  }
 
   return resolved;
 }
@@ -936,6 +945,31 @@ async function main() {
     // Use word-boundary to avoid matching "vibe coder" / "my vibes" etc.
     if (hasActionableKeyword(cleanPrompt, /\b(vibecodekit(?:[-\s]hybrid)?|vibecode[-\s]?master)\b/i)) {
       matches.push({ name: 'vibecodekit-hybrid', args: '' });
+    }
+
+    // Sub-skill routing: explicit mention of rri-t / rri-ux / rri-ui hits just that stage.
+    // Patterns are intentionally strict (hyphenated short forms only) to avoid false positives
+    // on unrelated mentions of "ui" or "ux". Orchestrator still wins in priority order below.
+    if (hasActionableKeyword(cleanPrompt, /\brri-t\b|\bflow[-\s]?physics[-\s]?test\b/i)) {
+      matches.push({ name: 'vibecodekit-hybrid-rri-t', args: '' });
+    }
+    // Negative lookahead `(?![-\s]?test)` keeps `flow-physics-test` from
+    // also matching this branch — that variant is the RRI-T cue. Without it
+    // both rri-t and rri-ux fire for the same prompt and the orchestrator
+    // suppression below cannot help (it only kicks in when the full
+    // vibecodekit-hybrid keyword is present).
+    if (hasActionableKeyword(cleanPrompt, /\brri-ux\b|\bflow[-\s]?physics(?:[-\s]?critique)?\b(?![-\s]?test)/i)) {
+      matches.push({ name: 'vibecodekit-hybrid-rri-ux', args: '' });
+    }
+    if (hasActionableKeyword(cleanPrompt, /\brri-ui\b|\bui[-\s]?design[-\s]?pipeline\b/i)) {
+      matches.push({ name: 'vibecodekit-hybrid-rri-ui', args: '' });
+    }
+    // RRI-SEC cues. Word-boundary `\brri-sec\b` plus a few short, unambiguous
+    // alias phrases. Avoid bare "security audit" — that fires too often on
+    // generic security-reviewer requests; the explicit `rri-sec` keyword or
+    // the longer phrase "vibecodekit security audit" is what gates this skill.
+    if (hasActionableKeyword(cleanPrompt, /\brri-sec\b|\bvibecodekit[-\s]?security[-\s]?audit\b|\bthreat[-\s]?model[-\s]?walk\b/i)) {
+      matches.push({ name: 'vibecodekit-hybrid-rri-sec', args: '' });
     }
 
     // No matches - pass through

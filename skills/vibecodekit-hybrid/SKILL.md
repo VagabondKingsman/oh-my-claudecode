@@ -2,7 +2,7 @@
 name: vibecodekit-hybrid
 description: Contractor–Worker pipeline combining Vibecodekit v5 methodology with OMC runtime (SCAN → RRI → VISION → BLUEPRINT → BUILD → VERIFY → REFINE)
 argument-hint: "[--interactive] [--pattern landing|saas|dashboard|blog|portfolio|enterprise-module|custom] [--locale en|vi] [--auto] <idea>"
-pipeline: [vibecodekit-hybrid-scan, vibecodekit-hybrid-rri, vibecodekit-hybrid-vision, ralplan, autopilot, vibecodekit-hybrid-verify, ai-slop-cleaner]
+pipeline: [vibecodekit-hybrid-scan, vibecodekit-hybrid-rri, vibecodekit-hybrid-vision, ralplan, vibecodekit-hybrid-rri-ux, autopilot, vibecodekit-hybrid-rri-t, vibecodekit-hybrid-rri-sec, vibecodekit-hybrid-verify, ai-slop-cleaner]
 next-skill: vibecodekit-hybrid-scan
 handoff: .omc/research/vibecodekit-hybrid-scan-*.md
 level: 4
@@ -43,7 +43,9 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 <Steps>
 
 ### Stage 0 — Classify the request
-1. Detect locale (`--locale` flag > project README language > `OMC_LOCALE` env).
+1. Detect locale using the signal ladder:
+   `.omc/locale.json` override → `OMC_LOCALE` env → `--locale` flag → `vibecodekit-hybrid-scan` README/manifest heuristics (if SCAN has already run) → default `en`.
+   Record the winning signal in the scan report; a non-default locale is inherited by every downstream stage without an extra flag.
 2. Detect interactive vs auto mode (`--interactive` default, `--auto` opt-in).
 3. Detect candidate vision pattern (`--pattern` flag, else let VISION stage decide).
 4. Allocate a slug: `<short-kebab-idea>` derived from the user's request.
@@ -67,6 +69,12 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 - Input: the scan + RRI + vision artifacts.
 - Output: `.omc/plans/vibecodekit-hybrid-<slug>.md` conforming to `templates/vibecodekit-hybrid/blueprint.md`, including the **RRI Requirements Matrix** and **Task Decomposition Preview**.
 
+### Stage 4b — RRI-UX critique (optional, delegate to `vibecodekit-hybrid-rri-ux`)
+- Trigger when the Blueprint contains UI scope AND mockups / wireframes exist.
+- Catches Flow Physics anti-patterns before code is written.
+- Artifact: `.omc/research/vibecodekit-hybrid-rri-ux-<slug>.md`; updates `rri_ux_gate` in `.omc/deliverables.json`.
+- Any ❌ BROKEN items must be resolved (or explicitly waived) before BUILD.
+
 ### Stage 5 — APPROVED gate (only in `--interactive`)
 - Use `AskUserQuestion` with three options:
   - **APPROVED** — proceed to BUILD
@@ -81,10 +89,21 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 - Each delegated task MUST be handed off using a TIP (`templates/vibecodekit-hybrid/tip.md`).
 - Each worker MUST return a Completion Report (`templates/vibecodekit-hybrid/completion-report.md`).
 
+### Stage 6b — RRI-T adversarial QA (optional, delegate to `vibecodekit-hybrid-rri-t`)
+- Trigger after BUILD when the Blueprint scope warrants a full adversarial walk (e.g., public release, multi-persona impact, security surface).
+- Runs 5 testing personas × 7 dimensions × 8 stress axes; records 4-level verdict per test case.
+- Artifact: `.omc/verify/vibecodekit-hybrid-rri-t-<slug>.md`; updates `rri_t_gate` in `.omc/deliverables.json`.
+
+### Stage 6c — RRI-SEC security audit (delegate to `vibecodekit-hybrid-rri-sec`)
+- **Mandatory** when the Blueprint touches authn / authz / payments / PII / uploads / external integrations OR a regulatory regime (GDPR, PCI-DSS, HIPAA, PDPL) is in scope. Otherwise optional.
+- Runs 5 security personas (Threat Modeler / AppSec / Red Teamer / Compliance Auditor / Privacy Officer) × 8 attack axes (A1 AuthN, A2 AuthZ, A3 Injection, A4 Supply chain, A5 Secret hygiene, A6 Data exfil, A7 DoS/Abuse, A8 Side channel); records 4-level verdict per threat case (T→A→V→I→M).
+- Artifact: `.omc/verify/vibecodekit-hybrid-rri-sec-<slug>.md`; updates `rri_sec_gate` in `.omc/deliverables.json`. Any 🔴 forces `DO NOT SHIP`.
+
 ### Stage 7 — VERIFY (delegate to `vibecodekit-hybrid-verify`)
 - Invoke `Skill("oh-my-claudecode:vibecodekit-hybrid-verify")` with the blueprint path.
 - Required artifact: `.omc/plans/vibecodekit-hybrid-verify-<slug>.md` conforming to `templates/vibecodekit-hybrid/verify-report.md`.
 - Verdict uses 4 levels: PASS ✅ / FAIL ❌ / PAINFUL ⚠️ / MISSING 🔲.
+- VERIFY aggregates `rri_t_gate` / `rri_ux_gate` / `rri_ui_gate` / `rri_sec_gate` from `.omc/deliverables.json` into the final release decision.
 
 ### Stage 8 — REFINE (delegate to `ai-slop-cleaner`)
 - Only run if VERIFY produced any PAINFUL / MISSING rows, OR the user explicitly requested a cleanup pass.
@@ -105,7 +124,8 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
   - `.omc/specs/vibecodekit-hybrid-rri-<slug>.md`
   - `.omc/plans/vibecodekit-hybrid-<slug>.md` (Blueprint)
   - `.omc/plans/vibecodekit-hybrid-verify-<slug>.md` (Verify Report)
-- Downstream skill invocations: `vibecodekit-hybrid-scan`, `vibecodekit-hybrid-rri`, `vibecodekit-hybrid-vision`, `ralplan`, `autopilot` or `team`, `vibecodekit-hybrid-verify`, `ai-slop-cleaner` (conditional).
+  - `.omc/verify/vibecodekit-hybrid-rri-sec-<slug>.md` (when Stage 6c ran)
+- Downstream skill invocations: `vibecodekit-hybrid-scan`, `vibecodekit-hybrid-rri`, `vibecodekit-hybrid-vision`, `ralplan`, `autopilot` or `team`, `vibecodekit-hybrid-rri-t`, `vibecodekit-hybrid-rri-sec`, `vibecodekit-hybrid-verify`, `ai-slop-cleaner` (conditional).
 </Handoff_Contract>
 
 <Final_Checklist>
@@ -136,7 +156,14 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 ## Locale behaviour
 - Markdown headings and section names: always English.
 - User-facing prompts and artifact body text: match locale.
-- Vietnamese-specific UX/UI rules (VND, DD/MM/YYYY, CCCD/CMND, diacritic-insensitive search) are introduced in Phase 2 via `templates/rules/locale/vi/`. This skill declares the hook but does not enforce it yet.
+- Opt-in via `OMC_LOCALE=vi` env var (or `--locale vi` flag). When active, every sub-skill reads `locale/vi/*.vi.md` for persona bank, TIP / Completion Report / Blueprint / Verify prompt strings, and enables the Vietnamese-specific anti-pattern checklist (VND, DD/MM/YYYY, CCCD/CMND, diacritic-insensitive search, longest-VN-text buffer at 1440 / 768 / 375 px).
+- A VN-first project detected in SCAN (README diacritic-density > 8 % or Vietnamese diacritic in `package.json` / `pyproject.toml` / `Cargo.toml` description) is treated as `OMC_LOCALE=vi` even if the env var is unset. The full signal ladder lives in `skills/vibecodekit-hybrid-scan/SKILL.md` step 5.
+
+## CLI companion
+- `omc vibecodekit scaffold <slug> [--locale en|vi]` — create the canonical artifact skeleton (same paths this orchestrator produces) outside of Claude.
+- `omc vibecodekit status` — pretty-print the current release gate from `.omc/deliverables.json`.
+- `omc vibecodekit patterns` / `locales` — list available vision patterns and locale overlays.
+- The CLI is strictly for on-disk state; the pipeline itself always runs inside a Claude Code session.
 
 ## Attribution
 Adapted from Vibecodekit v5.0 (Contractor–Worker Protocol) and the RRI methodology family (RRI, RRI-T, RRI-UI, RRI-UX). Integrated as an OMC skill-pack; the OMC runtime is unchanged.
