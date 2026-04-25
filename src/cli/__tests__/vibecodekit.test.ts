@@ -101,11 +101,12 @@ describe('omc vibecodekit CLI', () => {
     expect(result.stdout).toContain('data-pipeline');
   });
 
-  it('lists available locales including vi overlay', () => {
+  it('lists available locales including vi and ja overlays', () => {
     const result = runCli(['vibecodekit', 'locales'], workDir);
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('en');
     expect(result.stdout).toContain('vi');
+    expect(result.stdout).toContain('ja');
   });
 
   it('scaffold creates canonical artifact skeleton + deliverables.json', () => {
@@ -174,6 +175,15 @@ describe('omc vibecodekit CLI', () => {
     ) as Record<string, unknown>;
     expect(deliverables.locale).toBe('vi');
     expect(deliverables.slug).toBe('landing-vn');
+  });
+
+  it('scaffold --locale ja sets locale in deliverables.json (Phase 4e)', () => {
+    runCli(['vibecodekit', 'scaffold', 'checkout-jp', '--locale', 'ja'], workDir);
+    const deliverables = JSON.parse(
+      readFileSync(join(workDir, '.omc/deliverables.json'), 'utf-8')
+    ) as Record<string, unknown>;
+    expect(deliverables.locale).toBe('ja');
+    expect(deliverables.slug).toBe('checkout-jp');
   });
 
   it('scaffold slugifies noisy input', () => {

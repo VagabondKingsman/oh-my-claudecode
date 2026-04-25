@@ -97,4 +97,30 @@ describe('resolveVibecodekitLocale', () => {
     );
     expect(getVibecodekitLocale(workDir, {})).toBe('vi');
   });
+
+  it('accepts ja from OMC_LOCALE env (Phase 4e)', () => {
+    const result = resolveVibecodekitLocale(workDir, { OMC_LOCALE: 'ja' });
+    expect(result.locale).toBe('ja');
+    expect(result.signal).toBe('env:OMC_LOCALE');
+    expect(result.rawValue).toBe('ja');
+  });
+
+  it('accepts ja from .omc/locale.json (Phase 4e)', () => {
+    writeFileSync(
+      join(workDir, '.omc/locale.json'),
+      JSON.stringify({ locale: 'ja' }),
+      'utf-8',
+    );
+    const result = resolveVibecodekitLocale(workDir, {});
+    expect(result.locale).toBe('ja');
+    expect(result.signal).toBe('omc-locale-json');
+  });
+
+  it('normalises POSIX-style ja_JP.UTF-8 → ja (Phase 4e)', () => {
+    const result = resolveVibecodekitLocale(workDir, {
+      OMC_LOCALE: 'ja_JP.UTF-8',
+    });
+    expect(result.locale).toBe('ja');
+    expect(result.signal).toBe('env:OMC_LOCALE');
+  });
 });

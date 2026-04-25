@@ -276,7 +276,11 @@ Phase 4f promotes vibecodekit from skill-pack to **first-class runtime citizen**
 - **CLI** — `omc vibecodekit status` now prints `locale_signal` alongside the gate so the CLI output matches what the HUD sees.
 - **Tests** — 24 new unit tests; total suite passes at 8 434 tests / 8 skipped.
 
-Vietnamese docs: [`locale/vi/VIBECODEKIT-HYBRID.vi.md`](./locale/vi/VIBECODEKIT-HYBRID.vi.md), locale overview: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md), migration guide: [`docs/VIBECODEKIT-MIGRATION.md`](./docs/VIBECODEKIT-MIGRATION.md).
+Phase 4e adds a third locale overlay to prove the locale-overlay pattern is reusable beyond Vietnamese:
+
+- **Japanese overlay** at [`locale/ja/`](./locale/ja/) — `OMC_LOCALE=ja` (or `--locale ja`, or `.omc/locale.json` `{"locale":"ja"}`) enables 12 Japanese-specific UX anti-patterns (敬語混在、半角カナ事故、JIS X 0212/0213 外字、和暦/西暦混在、〒住所欠落、PDF 文字化け、絵文字差異、人名 NFC 安定性、苗字/名前並び、CSV 化け、IME compositionend、ユニコード正規化境界), 5 Japanese personas, and APPI (個人情報保護法) Article 17/21/28 + マイナンバー法 control-evidence rows in the RRI-SEC report.
+
+Locale docs: [`locale/vi/`](./locale/vi/) (Vietnamese), [`locale/ja/`](./locale/ja/) (Japanese). Migration guide: [`docs/VIBECODEKIT-MIGRATION.md`](./docs/VIBECODEKIT-MIGRATION.md).
 
 ### Intelligent Orchestration
 

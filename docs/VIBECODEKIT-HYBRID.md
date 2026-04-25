@@ -111,7 +111,7 @@ Available flags:
 - `--interactive` (default): stop at APPROVED gate after BLUEPRINT
 - `--auto`: bypass APPROVED gate; treat blueprint as pre-approved
 - `--pattern <one of landing|saas|dashboard|blog|portfolio|enterprise-module|mobile-app|cli-tool|data-pipeline|custom>`: override auto-detection
-- `--locale <en|vi>`: override auto-detection (README + `OMC_LOCALE`)
+- `--locale <en|vi|ja>`: override auto-detection (README + `OMC_LOCALE`)
 
 ## Relationship to existing OMC skills
 
@@ -376,9 +376,28 @@ Phase 4d adds the third RRI sub-skill alongside RRI-T and RRI-UX: the security-i
 - **Keyword detector** triggers on `rri-sec`, `vibecodekit security audit`, `threat model walk` (intentionally tight to avoid false positives against the generic `security-review` skill).
 - **Vietnamese overlay** at `locale/vi/skills/vibecodekit-hybrid-rri-sec.vi.md` and `locale/vi/agents/rri-security-auditor.vi.md` — PDPL Decree 13/2023 control-evidence rows + Vietnamese-specific threat axes are mandatory when `OMC_LOCALE=vi`.
 
+## What Phase 4e delivers (this PR)
+
+Phase 4e proves the locale-overlay pattern (introduced for Vietnamese in Phase 2) is **reusable for any locale** by shipping a second concrete overlay: Japanese.
+
+- **Runtime locale type extension** — `src/lib/vibecodekit-locale.ts` widens `VibecodekitLocale` from `'en' | 'vi'` to `'en' | 'vi' | 'ja'` and adds `'ja'` to `SUPPORTED_LOCALES`. POSIX-style values (`ja_JP.UTF-8` → `ja`) normalise via the same head-split logic. Unsupported locales (`fr`, `ko`, ...) still fall through to the default `en`.
+- **CLI** — `omc vibecodekit scaffold --locale ja` is now valid (the parser previously rejected anything but `en` / `vi`). `omc vibecodekit locales` lists `en`, `vi`, `ja`.
+- **SCAN extension** — `vibecodekit-hybrid-scan/SKILL.md` adds Japanese signals to the auto-detection ladder: README codepoint-density heuristic for Hiragana / Katakana / CJK Unified Ideographs (`\u3040-\u30FF\u4E00-\u9FFF`) at > 20% of any 400-char window → `ja`; `package.json` / `pyproject.toml` / `Cargo.toml` description containing Hiragana / Katakana → `ja`.
+- **Locale overlay files** under `locale/ja/`:
+  - `README.ja.md` — overview + 12 Japanese anti-pattern checklist + 5 Japanese personas
+  - `VIBECODEKIT-HYBRID.ja.md` — pipeline-stage-specific Japanese rules + PDF-JA-01..08 fixture probes
+  - `agents/rri-security-auditor.ja.md` — APPI 第 17/21/28 条 + マイナンバー法 control-evidence rows
+  - `agents/rri-tester.ja.md` — Japanese stress axes (IME, NFC/NFD normalisation, OTP same-counter)
+  - `agents/rri-ux-critic.ja.md` — 12 anti-patterns mandatory under `OMC_LOCALE=ja`
+  - `skills/vibecodekit-hybrid-rri-sec.ja.md` — RRI-SEC overlay
+  - `skills/vibecodekit-hybrid-rri-ui.ja.md` — RRI-UI overlay
+- **Tests** — 3 new locale resolver tests (`ja` env / `ja` `.omc/locale.json` / POSIX `ja_JP.UTF-8` normalisation) + the CLI scaffold test (`--locale ja`) and a `locales` listing assertion now includes `ja`.
+
+The orchestrator skill (`vibecodekit-hybrid/SKILL.md`) and verify aggregator (`vibecodekit-hybrid-verify/SKILL.md`) require **no changes** — they already read the locale via the runtime resolver, so the new code path is inherited automatically. This validates the locale-overlay pattern as the recommended way to add future locales (`ko`, `zh-Hans`, `id`, ...): drop a new directory under `locale/<code>/`, widen the `VibecodekitLocale` union + `SUPPORTED_LOCALES` list, and ship.
+
 ## What is still out of scope
 
-Phase 4a / 4c / 4d / 4f deliberately stop at the read-only HUD + CI surface. Future phases could:
+Phase 4a / 4c / 4d / 4e / 4f deliberately stop at the read-only HUD + CI surface. Future phases could:
 
 - Convert the Vietnamese persona banks into a standalone Claude skill plugin.
 - Add a hook surface that blocks `git push` when the gate is 🔴 (opt-in, client-side).

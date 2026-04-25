@@ -94599,7 +94599,7 @@ var import_url17 = require("url");
 var import_node_fs8 = require("node:fs");
 var import_node_path12 = require("node:path");
 init_worktree_paths();
-var SUPPORTED_LOCALES = ["en", "vi"];
+var SUPPORTED_LOCALES = ["en", "vi", "ja"];
 function normaliseLocale(raw) {
   if (!raw) return null;
   const trimmed = raw.trim().toLowerCase();
@@ -94725,7 +94725,7 @@ var VIBECODEKIT_HELP = `omc vibecodekit - Vibecodekit Hybrid preset artifact man
 
 Usage:
   omc vibecodekit help
-  omc vibecodekit scaffold <slug> [--locale en|vi]
+  omc vibecodekit scaffold <slug> [--locale en|vi|ja]
   omc vibecodekit status [<slug>]
   omc vibecodekit validate [<path>]
   omc vibecodekit patterns
@@ -94734,7 +94734,8 @@ Usage:
 Subcommands:
   help        Show this help message.
   scaffold    Create .omc/ directories + blank artifact templates for <slug>.
-              --locale vi mirrors Vietnamese overlays from locale/vi/ too.
+              --locale vi mirrors Vietnamese overlays from locale/vi/ too,
+              --locale ja mirrors Japanese overlays from locale/ja/.
   status      Read .omc/deliverables.json and print the current release gate.
               If <slug> is given, only that slug's gate is printed.
   validate    Validate .omc/deliverables.json (or the path you pass) against
@@ -94748,7 +94749,7 @@ Notes:
   - The actual pipeline runs inside a Claude Code session via the skill
     /oh-my-claudecode:vibecodekit-hybrid. This CLI only manages on-disk state.
   - All artifact headings stay in English for tool parsing; only body text
-    switches language under --locale vi.
+    switches language under --locale vi or --locale ja.
 `;
 function findPluginRoot() {
   const envRoot = process.env["OMC_PLUGIN_ROOT"];
@@ -94794,20 +94795,20 @@ function parseScaffoldArgs(args) {
     const a = args[i];
     if (a === "--locale") {
       const v = args[i + 1];
-      if (v === "vi" || v === "en") {
+      if (v === "vi" || v === "en" || v === "ja") {
         locale = v;
         localeExplicit = true;
         i += 1;
       } else {
-        throw new Error(`--locale must be 'en' or 'vi' (got '${v ?? ""}')`);
+        throw new Error(`--locale must be 'en', 'vi', or 'ja' (got '${v ?? ""}')`);
       }
     } else if (a?.startsWith("--locale=")) {
       const v = a.slice("--locale=".length);
-      if (v === "vi" || v === "en") {
+      if (v === "vi" || v === "en" || v === "ja") {
         locale = v;
         localeExplicit = true;
       } else {
-        throw new Error(`--locale must be 'en' or 'vi' (got '${v}')`);
+        throw new Error(`--locale must be 'en', 'vi', or 'ja' (got '${v}')`);
       }
     } else if (a && !a.startsWith("-") && !slugArg) {
       slugArg = a;

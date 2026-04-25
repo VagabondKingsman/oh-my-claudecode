@@ -22,7 +22,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getOmcRoot } from './worktree-paths.js';
 
-export type VibecodekitLocale = 'en' | 'vi';
+export type VibecodekitLocale = 'en' | 'vi' | 'ja';
 
 export type VibecodekitLocaleSignal =
   | 'omc-locale-json'
@@ -40,7 +40,7 @@ export interface VibecodekitLocaleResolution {
 }
 
 /** Supported locales. Extend when more overlays ship (`locale/<code>/`). */
-const SUPPORTED_LOCALES: readonly VibecodekitLocale[] = ['en', 'vi'] as const;
+const SUPPORTED_LOCALES: readonly VibecodekitLocale[] = ['en', 'vi', 'ja'] as const;
 
 function normaliseLocale(raw: string | undefined | null): VibecodekitLocale | null {
   if (!raw) return null;

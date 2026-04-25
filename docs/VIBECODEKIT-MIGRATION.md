@@ -196,18 +196,54 @@ Phase 4d adds the third RRI sub-skill alongside RRI-T and RRI-UX: the security-i
    - Diacritic-stripping side-channel check (A8) is added by default.
    - Telex / VNI input fuzz (A3) is appended to every input-validation walk.
 
+## From Phase 4d → Phase 4e
+
+Phase 4e adds a Japanese locale overlay to prove the locale-overlay pattern is reusable beyond Vietnamese.
+
+1. Pull the branch / PR that introduces Phase 4e.
+2. Confirm the new locale tree:
+   ```bash
+   ls locale/ja/README.ja.md locale/ja/VIBECODEKIT-HYBRID.ja.md
+   ls locale/ja/agents/ locale/ja/skills/
+   ```
+3. Rebuild + retest:
+   ```bash
+   npm run build && npm test -- --run
+   # expected: 23 agents, 42 canonical skills, ≥8 502 tests
+   ```
+4. Three new entry points for users authoring Japanese-first projects:
+   ```bash
+   # Per-shell
+   export OMC_LOCALE=ja
+   # Per-project pin
+   echo '{"locale":"ja"}' > .omc/locale.json
+   # Per-run
+   omc vibecodekit scaffold checkout-jp --locale ja
+   ```
+5. SCAN auto-detects Japanese repositories using:
+   - README codepoint-density: `count_of_codepoints_in_[\u3040-\u30FF\u4E00-\u9FFF] / total > 0.20` over any 400-char window → `ja`
+   - Manifest heuristic: any Hiragana / Katakana codepoint in `package.json` description / author / keywords → `ja`
+6. Under `OMC_LOCALE=ja`, the RRI-SEC agent activates Japanese-specific lanes:
+   - APPI Article 17 / 21 / 28 control-evidence rows (mandatory).
+   - マイナンバー法 isolation evidence (when applicable).
+   - Unicode normalisation (NFC ↔ NFD) is added as a mandatory A8 axis.
+   - JIS X 0212/0213 外字 logging / PDF / backup integrity is added to A6.
+   - OTP same-counter rate-limit across SMS / LINE / mail is added to A1.
+7. RRI-UX adds 12 mandatory anti-pattern checks (敬語混在、半角カナ、JIS 外字、和暦/西暦、〒、PDF 文字化け、絵文字差異、人名 NFC、苗字/名前並び、CSV 化け、IME compositionend、NFC/NFD 境界).
+
 ## Breaking changes between phases
 
-**None.** Phase 2, Phase 3, Phase 4a, Phase 4b, Phase 4c, Phase 4d, and Phase 4f are strictly additive. Existing skills, agent names, prompts, templates, and artifacts all continue to work. `HudRenderContext.vibecodekitGate` is optional, so existing HUD mocks/presets compile without modification. Phase 4c does NOT relax or change any field already in `.omc/deliverables.json` — the schema reflects the shape Phase 1–4b were already producing, plus the optional `pattern` and `followups` fields surfaced by examples.
+**None.** Phase 2, Phase 3, Phase 4a, Phase 4b, Phase 4c, Phase 4d, Phase 4e, and Phase 4f are strictly additive. Existing skills, agent names, prompts, templates, and artifacts all continue to work. `HudRenderContext.vibecodekitGate` is optional, so existing HUD mocks/presets compile without modification. Phase 4c does NOT relax or change any field already in `.omc/deliverables.json`. Phase 4e does NOT change the agent count or skill count — it only widens the `VibecodekitLocale` type union and adds files under `locale/ja/`.
 
 If you maintain a vendored copy of OMC and pin agent counts elsewhere, the expected numbers are:
 
-| Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4f | Phase 4d |
-|--------|---------|---------|---------|----------|----------|
-| Agents | 20 | 22 | 22 | 22 | 23 |
-| Canonical skills | 38 | 41 | 41 | 41 | 42 |
-| Skills including aliases | 39 | 42 | 42 | 42 | 43 |
-| Passing tests | 8 394 | 8 400 | 8 410 | 8 434 | ≥8 434 |
+| Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4f | Phase 4d | Phase 4e |
+|--------|---------|---------|---------|----------|----------|----------|
+| Agents | 20 | 22 | 22 | 22 | 23 | 23 |
+| Canonical skills | 38 | 41 | 41 | 41 | 42 | 42 |
+| Skills including aliases | 39 | 42 | 42 | 42 | 43 | 43 |
+| Locale overlays | 0 | 1 (vi) | 1 (vi) | 1 (vi) | 1 (vi) | 2 (vi, ja) |
+| Passing tests | 8 394 | 8 400 | 8 410 | 8 434 | ≥8 499 | ≥8 502 |
 
 ## Rollback
 

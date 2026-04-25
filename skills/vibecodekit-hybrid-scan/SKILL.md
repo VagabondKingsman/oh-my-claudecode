@@ -44,12 +44,14 @@ RRI interviews go faster and feel less bureaucratic when the interviewer knows t
    - CI pipelines
 3. Classify repo as Greenfield (near-empty / scaffold-only) or Brownfield (substantial code + patterns).
 4. Read the top-level README to capture declared purpose + audience.
-5. **Locale auto-detection** (Phase 3). Run in order; the **first signal that fires wins**:
-   1. Explicit override: `.omc/locale.json` has `{"locale":"vi"}` → set detected locale to `vi`.
-   2. Env var: `OMC_LOCALE=vi` → `vi`.
-   3. User flag: `--locale vi` passed to the orchestrator → `vi`.
-   4. README heuristic: read `README.md` (fallback `README.vi.md`). If `vowels_with_VN_diacritic / total_vowels > 0.08` over any 400-character window, set `vi`.
-   5. Manifest heuristic: if `package.json` `description` / `author.name` / `keywords` (or equivalent in `pyproject.toml` / `Cargo.toml`) contain any VN diacritic character (`À-ỹ`, excluding `Ư`/`Ơ` singletons used in tech names), set `vi`.
+5. **Locale auto-detection** (Phase 3 / extended in Phase 4e). Run in order; the **first signal that fires wins**:
+   1. Explicit override: `.omc/locale.json` has `{"locale":"vi"}` (or `"ja"`) → set detected locale to that value.
+   2. Env var: `OMC_LOCALE=vi` → `vi`. `OMC_LOCALE=ja` → `ja`. (Phase 4e)
+   3. User flag: `--locale vi` (or `--locale ja`) passed to the orchestrator. (Phase 4e)
+   4. README heuristic: read `README.md` (fallback `README.vi.md` / `README.ja.md`).
+      - If `vowels_with_VN_diacritic / total_vowels > 0.08` over any 400-char window → `vi`.
+      - If any 400-char window has `count_of_codepoints_in_[\u3040-\u30FF\u4E00-\u9FFF] / total_chars > 0.20` → `ja`. (Phase 4e — Hiragana / Katakana / CJK Unified Ideographs)
+   5. Manifest heuristic: if `package.json` `description` / `author.name` / `keywords` (or equivalent in `pyproject.toml` / `Cargo.toml`) contain VN diacritic chars (`À-ỹ`, excluding `Ư`/`Ơ` singletons used in tech names) → `vi`. If they contain any Hiragana / Katakana codepoint → `ja`. (Phase 4e)
    6. Default: `en`.
    Record the winning signal in the scan report's **Locale** section (signal name + evidence snippet). A non-default locale MUST be echoed back to the orchestrator so the rest of the pipeline picks it up without an explicit flag.
 6. Identify **Gaps / Smells**: missing tests, inconsistent conventions, obvious tech-debt hotspots.
