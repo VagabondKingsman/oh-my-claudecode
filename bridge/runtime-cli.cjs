@@ -1254,7 +1254,8 @@ var KNOWN_AGENT_NAMES = [
   "documentSpecialist",
   "rriInterviewer",
   "rriTester",
-  "rriUxCritic"
+  "rriUxCritic",
+  "rriSecurityAuditor"
 ];
 
 // src/utils/paths.ts
@@ -1632,7 +1633,8 @@ function buildDefaultConfig() {
       documentSpecialist: { model: defaultTierModels.MEDIUM },
       rriInterviewer: { model: defaultTierModels.MEDIUM },
       rriTester: { model: defaultTierModels.MEDIUM },
-      rriUxCritic: { model: defaultTierModels.MEDIUM }
+      rriUxCritic: { model: defaultTierModels.MEDIUM },
+      rriSecurityAuditor: { model: defaultTierModels.MEDIUM }
     },
     features: {
       parallelExecution: true,
@@ -2530,6 +2532,36 @@ var rriUxCriticAgent = {
   model: "sonnet",
   defaultModel: "sonnet",
   metadata: RRI_UX_CRITIC_PROMPT_METADATA
+};
+
+// src/agents/rri-security-auditor.ts
+var RRI_SECURITY_AUDITOR_PROMPT_METADATA = {
+  category: "specialist",
+  cost: "CHEAP",
+  promptAlias: "RRISecurityAuditor",
+  triggers: [
+    { domain: "Security", trigger: "Adversarial security walk (5 personas \xD7 8 attack axes)" },
+    { domain: "Compliance", trigger: "Threat-model + control-evidence coverage with 4-level verdict" },
+    { domain: "Vibecodekit", trigger: "RRI-SEC stage of the vibecodekit-hybrid pipeline" }
+  ],
+  useWhen: [
+    "Build handles authn/authz, payments, PII, uploads, or external integrations and needs structured threat coverage before release",
+    'User invoked vibecodekit-hybrid-rri-sec or asked for "rri-sec", "security audit", "threat model"',
+    "security-reviewer pass passes but MISSING / PAINFUL threats are suspected (no rate-limits, no audit trail, etc.)"
+  ],
+  avoidWhen: [
+    "Feature is still in RRI / VISION / BLUEPRINT \u2014 there is nothing concrete to attack",
+    "Only a static-analysis lint pass is needed (use security-reviewer or test-engineer instead)",
+    "User asks for live exploitation against production \u2014 refuse and emit a ticket"
+  ]
+};
+var rriSecurityAuditorAgent = {
+  name: "rri-security-auditor",
+  description: "RRI-SEC specialist (Sonnet). Runs 5 security personas (Threat Modeler / AppSec / Red Teamer / Compliance Auditor / Privacy Officer) \xD7 8 attack axes (A1 AuthN, A2 AuthZ, A3 Injection, A4 Supply chain, A5 Secret hygiene, A6 Data exfil, A7 DoS/Abuse, A8 Side channel), emits T\u2192A\u2192V\u2192I\u2192M threat cases with a 4-level verdict (PASS / FAIL / PAINFUL / MISSING) per case, computes a Module \xD7 Attack-axis coverage matrix, and emits a release-gate decision for the vibecodekit-hybrid pipeline.",
+  prompt: loadAgentPrompt("rri-security-auditor"),
+  model: "sonnet",
+  defaultModel: "sonnet",
+  metadata: RRI_SECURITY_AUDITOR_PROMPT_METADATA
 };
 
 // src/agents/document-specialist.ts
