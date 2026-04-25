@@ -232,6 +232,7 @@ function scaffoldCommand(args: readonly string[]): number {
       rri_t_gate: null,
       rri_ux_gate: null,
       rri_ui_gate: null,
+      rri_sec_gate: null,
       artifact: `.omc/plans/vibecodekit-hybrid-verify-${slug}.md`,
       updated_at: new Date().toISOString(),
     };
@@ -303,6 +304,7 @@ function statusCommand(args: readonly string[]): number {
   console.log(`  rri_t_gate       : ${parsed.rri_t_gate ?? '—'}`);
   console.log(`  rri_ux_gate      : ${parsed.rri_ux_gate ?? '—'}`);
   console.log(`  rri_ui_gate      : ${parsed.rri_ui_gate ?? '—'}`);
+  console.log(`  rri_sec_gate     : ${parsed.rri_sec_gate ?? '—'}`);
   const artifact = parsed.artifact as string | undefined;
   if (artifact) console.log(`  artifact         : ${artifact}`);
   const updatedAt = parsed.updated_at as string | undefined;

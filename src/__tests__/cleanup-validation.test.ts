@@ -46,13 +46,14 @@ describe('Cleanup Validation', () => {
     expect(agentKeys).not.toContain('buildFixer');
   });
 
-  it('agent registry has 22 agents', async () => {
+  it('agent registry has 23 agents', async () => {
     const { getAgentDefinitions } = await import('../agents/definitions.js');
     const defs = getAgentDefinitions();
-    expect(Object.keys(defs)).toHaveLength(22);
+    expect(Object.keys(defs)).toHaveLength(23);
     expect(defs).toHaveProperty('tracer');
     expect(defs).toHaveProperty('rri-interviewer');
     expect(defs).toHaveProperty('rri-tester');
     expect(defs).toHaveProperty('rri-ux-critic');
+    expect(defs).toHaveProperty('rri-security-auditor');
   });
 });

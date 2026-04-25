@@ -126,6 +126,7 @@ describe('renderVibecodekitGate', () => {
     rriTGate: null,
     rriUxGate: null,
     rriUiGate: null,
+    rriSecGate: null,
     ...overrides,
   });
 
@@ -184,6 +185,7 @@ describe('renderVibecodekitGateCompact', () => {
       rriTGate: null,
       rriUxGate: null,
       rriUiGate: null,
+      rriSecGate: null,
     });
     expect(out).toBe('VK:🟢');
   });
@@ -197,6 +199,7 @@ describe('renderVibecodekitGateCompact', () => {
       rriTGate: null,
       rriUxGate: null,
       rriUiGate: null,
+      rriSecGate: null,
     });
     expect(out).toBe('VK:🔴');
   });

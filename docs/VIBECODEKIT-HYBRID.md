@@ -151,6 +151,7 @@ Available flags:
 |---|-------|---------------|----------|
 | 4b | RRI-UX (pre-design critique) | `vibecodekit-hybrid-rri-ux` → `rri-ux-critic` | `.omc/research/vibecodekit-hybrid-rri-ux-<slug>.md` + `rri_ux_gate` |
 | 6b | RRI-T (adversarial QA) | `vibecodekit-hybrid-rri-t` → `rri-tester` | `.omc/verify/vibecodekit-hybrid-rri-t-<slug>.md` + `rri_t_gate` |
+| 6c | RRI-SEC (security audit) | `vibecodekit-hybrid-rri-sec` → `rri-security-auditor` | `.omc/verify/vibecodekit-hybrid-rri-sec-<slug>.md` + `rri_sec_gate` |
 | — | RRI-UI (composed pipeline) | `vibecodekit-hybrid-rri-ui` (5 phases, wraps `-rri-ux` + `-rri-t`) | `.omc/design/vibecodekit-hybrid-rri-ui-<slug>.md` + `rri_ui_gate` |
 
 ### Deliverables JSON contract
@@ -360,9 +361,24 @@ echo 'omc vibecodekit validate' >> .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 ```
 
+## What Phase 4d delivers (this PR)
+
+Phase 4d adds the third RRI sub-skill alongside RRI-T and RRI-UX: the security-intake layer that the pipeline previously had to leave to a generic `security-reviewer` pass.
+
+- **Skill** `vibecodekit-hybrid-rri-sec` (Stage 6c). Mandatory when the Blueprint touches authn / authz / payments / PII / uploads / external integrations OR a regulatory regime (GDPR / PCI-DSS / HIPAA / PDPL) is in scope.
+- **Agent** `rri-security-auditor` (Sonnet). 5 security personas (Threat Modeler / AppSec Engineer / Red Teamer / Compliance Auditor / Privacy Officer) × 8 attack axes (A1 AuthN, A2 AuthZ, A3 Injection, A4 Supply chain, A5 Secret hygiene, A6 Data exfil, A7 DoS / Abuse, A8 Side channel). Threat cases use the T→A→V→I→M format (Threat / Attacker / Vector / Impact / Mitigation) with a 4-level verdict (PASS / FAIL / PAINFUL / MISSING) per case.
+- **Template** `templates/vibecodekit-hybrid/rri-sec-report.md` — includes a Module × Attack-axis coverage matrix, a Trust Boundary inventory, a Compliance Evidence table (GDPR / PCI-DSS / **PDPL Decree 13/2023** rows pre-seeded), and a Vietnamese-locale rubric (CCCD / diacritic-stripping / VND formatting / Telex-VNI input fuzz / OTP cross-channel rate-limit).
+- **Runtime wiring**:
+  - `.omc/deliverables.json#/rri_sec_gate` ∈ { 🟢, 🟡, 🔴, null } added to the schema and the HUD reader (`readVibecodekitGateForHud`).
+  - `omc vibecodekit scaffold` seeds the field as `null`; `omc vibecodekit status` prints it alongside the other gates.
+  - The Phase 4a GitHub Check Run renders an extra `RRI-SEC (security audit)` row in the status summary.
+  - `vibecodekit-hybrid-verify` aggregates `rri_sec_gate` into the final release decision: any 🔴 forces `DO_NOT_SHIP`, any 🟡 forces `SHIP_WITH_FOLLOWUPS`.
+- **Keyword detector** triggers on `rri-sec`, `vibecodekit security audit`, `threat model walk` (intentionally tight to avoid false positives against the generic `security-review` skill).
+- **Vietnamese overlay** at `locale/vi/skills/vibecodekit-hybrid-rri-sec.vi.md` and `locale/vi/agents/rri-security-auditor.vi.md` — PDPL Decree 13/2023 control-evidence rows + Vietnamese-specific threat axes are mandatory when `OMC_LOCALE=vi`.
+
 ## What is still out of scope
 
-Phase 4a / 4c / 4f deliberately stop at the read-only HUD + CI surface. Future phases could:
+Phase 4a / 4c / 4d / 4f deliberately stop at the read-only HUD + CI surface. Future phases could:
 
 - Convert the Vietnamese persona banks into a standalone Claude skill plugin.
 - Add a hook surface that blocks `git push` when the gate is 🔴 (opt-in, client-side).
@@ -370,4 +386,4 @@ Phase 4a / 4c / 4f deliberately stop at the read-only HUD + CI surface. Future p
 
 ## Attribution
 
-Adapted from Vibecodekit v5.0 (Contractor–Worker Protocol) and the RRI methodology family (RRI, RRI-T, RRI-UI, RRI-UX) by Nguyễn (VagabondKingsman). Integrated as an OMC skill-pack across Phases 1–3; Phase 4f is the first runtime TypeScript integration and is still opt-in.
+Adapted from Vibecodekit v5.0 (Contractor–Worker Protocol) and the RRI methodology family (RRI, RRI-T, RRI-UI, RRI-UX, RRI-SEC) by Nguyễn (VagabondKingsman). Integrated as an OMC skill-pack across Phases 1–3; Phase 4f is the first runtime TypeScript integration and is still opt-in. Phase 4d adds the RRI-SEC layer.

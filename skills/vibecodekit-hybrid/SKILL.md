@@ -2,7 +2,7 @@
 name: vibecodekit-hybrid
 description: Contractor–Worker pipeline combining Vibecodekit v5 methodology with OMC runtime (SCAN → RRI → VISION → BLUEPRINT → BUILD → VERIFY → REFINE)
 argument-hint: "[--interactive] [--pattern landing|saas|dashboard|blog|portfolio|enterprise-module|custom] [--locale en|vi] [--auto] <idea>"
-pipeline: [vibecodekit-hybrid-scan, vibecodekit-hybrid-rri, vibecodekit-hybrid-vision, ralplan, vibecodekit-hybrid-rri-ux, autopilot, vibecodekit-hybrid-rri-t, vibecodekit-hybrid-verify, ai-slop-cleaner]
+pipeline: [vibecodekit-hybrid-scan, vibecodekit-hybrid-rri, vibecodekit-hybrid-vision, ralplan, vibecodekit-hybrid-rri-ux, autopilot, vibecodekit-hybrid-rri-t, vibecodekit-hybrid-rri-sec, vibecodekit-hybrid-verify, ai-slop-cleaner]
 next-skill: vibecodekit-hybrid-scan
 handoff: .omc/research/vibecodekit-hybrid-scan-*.md
 level: 4
@@ -94,11 +94,16 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
 - Runs 5 testing personas × 7 dimensions × 8 stress axes; records 4-level verdict per test case.
 - Artifact: `.omc/verify/vibecodekit-hybrid-rri-t-<slug>.md`; updates `rri_t_gate` in `.omc/deliverables.json`.
 
+### Stage 6c — RRI-SEC security audit (delegate to `vibecodekit-hybrid-rri-sec`)
+- **Mandatory** when the Blueprint touches authn / authz / payments / PII / uploads / external integrations OR a regulatory regime (GDPR, PCI-DSS, HIPAA, PDPL) is in scope. Otherwise optional.
+- Runs 5 security personas (Threat Modeler / AppSec / Red Teamer / Compliance Auditor / Privacy Officer) × 8 attack axes (A1 AuthN, A2 AuthZ, A3 Injection, A4 Supply chain, A5 Secret hygiene, A6 Data exfil, A7 DoS/Abuse, A8 Side channel); records 4-level verdict per threat case (T→A→V→I→M).
+- Artifact: `.omc/verify/vibecodekit-hybrid-rri-sec-<slug>.md`; updates `rri_sec_gate` in `.omc/deliverables.json`. Any 🔴 forces `DO NOT SHIP`.
+
 ### Stage 7 — VERIFY (delegate to `vibecodekit-hybrid-verify`)
 - Invoke `Skill("oh-my-claudecode:vibecodekit-hybrid-verify")` with the blueprint path.
 - Required artifact: `.omc/plans/vibecodekit-hybrid-verify-<slug>.md` conforming to `templates/vibecodekit-hybrid/verify-report.md`.
 - Verdict uses 4 levels: PASS ✅ / FAIL ❌ / PAINFUL ⚠️ / MISSING 🔲.
-- VERIFY aggregates `rri_t_gate` / `rri_ux_gate` / `rri_ui_gate` from `.omc/deliverables.json` into the final release decision.
+- VERIFY aggregates `rri_t_gate` / `rri_ux_gate` / `rri_ui_gate` / `rri_sec_gate` from `.omc/deliverables.json` into the final release decision.
 
 ### Stage 8 — REFINE (delegate to `ai-slop-cleaner`)
 - Only run if VERIFY produced any PAINFUL / MISSING rows, OR the user explicitly requested a cleanup pass.
@@ -119,7 +124,8 @@ Autopilot is optimised for speed; it assumes the goal is clear. Many real projec
   - `.omc/specs/vibecodekit-hybrid-rri-<slug>.md`
   - `.omc/plans/vibecodekit-hybrid-<slug>.md` (Blueprint)
   - `.omc/plans/vibecodekit-hybrid-verify-<slug>.md` (Verify Report)
-- Downstream skill invocations: `vibecodekit-hybrid-scan`, `vibecodekit-hybrid-rri`, `vibecodekit-hybrid-vision`, `ralplan`, `autopilot` or `team`, `vibecodekit-hybrid-verify`, `ai-slop-cleaner` (conditional).
+  - `.omc/verify/vibecodekit-hybrid-rri-sec-<slug>.md` (when Stage 6c ran)
+- Downstream skill invocations: `vibecodekit-hybrid-scan`, `vibecodekit-hybrid-rri`, `vibecodekit-hybrid-vision`, `ralplan`, `autopilot` or `team`, `vibecodekit-hybrid-rri-t`, `vibecodekit-hybrid-rri-sec`, `vibecodekit-hybrid-verify`, `ai-slop-cleaner` (conditional).
 </Handoff_Contract>
 
 <Final_Checklist>

@@ -28,6 +28,7 @@ export { tracerAgent } from './tracer.js';
 export { rriInterviewerAgent } from './rri-interviewer.js';
 export { rriTesterAgent } from './rri-tester.js';
 export { rriUxCriticAgent } from './rri-ux-critic.js';
+export { rriSecurityAuditorAgent } from './rri-security-auditor.js';
 
 export { documentSpecialistAgent } from './document-specialist.js';
 
@@ -46,6 +47,7 @@ import { tracerAgent } from './tracer.js';
 import { rriInterviewerAgent } from './rri-interviewer.js';
 import { rriTesterAgent } from './rri-tester.js';
 import { rriUxCriticAgent } from './rri-ux-critic.js';
+import { rriSecurityAuditorAgent } from './rri-security-auditor.js';
 import { documentSpecialistAgent } from './document-specialist.js';
 
 // Re-export loadAgentPrompt (also exported from index.ts)
@@ -178,6 +180,7 @@ const AGENT_CONFIG_KEY_MAP = {
   'rri-interviewer': 'rriInterviewer',
   'rri-tester': 'rriTester',
   'rri-ux-critic': 'rriUxCritic',
+  'rri-security-auditor': 'rriSecurityAuditor',
 } as const satisfies Partial<Record<string, keyof NonNullable<PluginConfig['agents']>>>;
 
 function getConfiguredAgentModel(name: string, config: PluginConfig): string | undefined {
@@ -250,6 +253,7 @@ export function getAgentDefinitions(options?: {
     'rri-interviewer': rriInterviewerAgent,
     'rri-tester': rriTesterAgent,
     'rri-ux-critic': rriUxCriticAgent,
+    'rri-security-auditor': rriSecurityAuditorAgent,
 
     // ============================================================
     // COORDINATION

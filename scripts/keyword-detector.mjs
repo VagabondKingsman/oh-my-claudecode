@@ -769,7 +769,7 @@ function resolveConflicts(matches) {
   // Sort by priority order
   const priorityOrder = ['cancel','ralph','autopilot','ultrawork',
     'ccg','ralplan','deep-interview','vibecodekit-hybrid',
-    'vibecodekit-hybrid-rri-ui','vibecodekit-hybrid-rri-ux','vibecodekit-hybrid-rri-t',
+    'vibecodekit-hybrid-rri-ui','vibecodekit-hybrid-rri-ux','vibecodekit-hybrid-rri-t','vibecodekit-hybrid-rri-sec',
     'ai-slop-cleaner','tdd','code-review','security-review','ultrathink','deepsearch','analyze'];
   resolved.sort((a, b) => priorityOrder.indexOf(a.name) - priorityOrder.indexOf(b.name));
 
@@ -963,6 +963,13 @@ async function main() {
     }
     if (hasActionableKeyword(cleanPrompt, /\brri-ui\b|\bui[-\s]?design[-\s]?pipeline\b/i)) {
       matches.push({ name: 'vibecodekit-hybrid-rri-ui', args: '' });
+    }
+    // RRI-SEC cues. Word-boundary `\brri-sec\b` plus a few short, unambiguous
+    // alias phrases. Avoid bare "security audit" — that fires too often on
+    // generic security-reviewer requests; the explicit `rri-sec` keyword or
+    // the longer phrase "vibecodekit security audit" is what gates this skill.
+    if (hasActionableKeyword(cleanPrompt, /\brri-sec\b|\bvibecodekit[-\s]?security[-\s]?audit\b|\bthreat[-\s]?model[-\s]?walk\b/i)) {
+      matches.push({ name: 'vibecodekit-hybrid-rri-sec', args: '' });
     }
 
     // No matches - pass through

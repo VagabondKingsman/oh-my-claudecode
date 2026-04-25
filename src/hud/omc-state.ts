@@ -333,6 +333,7 @@ interface VibecodekitDeliverablesFile {
   rri_t_gate?: string | null;
   rri_ux_gate?: string | null;
   rri_ui_gate?: string | null;
+  rri_sec_gate?: string | null;
   locale?: string;
 }
 
@@ -359,6 +360,7 @@ export interface VibecodekitGateForHud {
   rriTGate: VibecodekitGateGlyph | null;
   rriUxGate: VibecodekitGateGlyph | null;
   rriUiGate: VibecodekitGateGlyph | null;
+  rriSecGate: VibecodekitGateGlyph | null;
 }
 
 const GATE_GLYPHS: readonly VibecodekitGateGlyph[] = ['🟢', '🟡', '🔴'];
@@ -436,6 +438,7 @@ export function readVibecodekitGateForHud(directory: string): VibecodekitGateFor
     rriTGate: normaliseGate(parsed.rri_t_gate),
     rriUxGate: normaliseGate(parsed.rri_ux_gate),
     rriUiGate: normaliseGate(parsed.rri_ui_gate),
+    rriSecGate: normaliseGate(parsed.rri_sec_gate),
   };
 }
 

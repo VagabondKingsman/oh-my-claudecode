@@ -1,6 +1,6 @@
 # Vibecodekit Hybrid — Migration Guide
 
-This guide walks you through upgrading an OMC checkout between the vibecodekit-hybrid phases (1, 2, 3, 4f). All phases are additive — nothing installed in an earlier phase is removed later. You can stop at any phase if you only need that surface.
+This guide walks you through upgrading an OMC checkout between the vibecodekit-hybrid phases (1, 2, 3, 4a, 4b, 4c, 4d, 4f). All phases are additive — nothing installed in an earlier phase is removed later. You can stop at any phase if you only need that surface.
 
 ## At-a-glance
 
@@ -160,18 +160,54 @@ Phase 4c freezes the `.omc/deliverables.json` shape behind a JSON Schema and add
    - `release_decision ∈ {SHIP_WITH_FOLLOWUPS, DO_NOT_SHIP}` requires a non-empty `followups` array.
    - `additionalProperties: false` everywhere — adding an unknown field surfaces as a schema error.
 
+## From Phase 4c → Phase 4d
+
+Phase 4d adds the third RRI sub-skill alongside RRI-T and RRI-UX: the security-intake layer (`vibecodekit-hybrid-rri-sec` + `rri-security-auditor`).
+
+1. Pull the branch / PR that introduces Phase 4d.
+2. Confirm the new skill / agent / template:
+   ```bash
+   ls skills/vibecodekit-hybrid-rri-sec/SKILL.md
+   ls agents/rri-security-auditor.md
+   ls templates/vibecodekit-hybrid/rri-sec-report.md
+   ```
+3. Rebuild + retest:
+   ```bash
+   npm run build && npm test -- --run
+   # expected: 23 agents, 42 canonical skills
+   ```
+4. The pipeline now contains an optional **Stage 6c** (mandatory when authn / authz / payments / PII / uploads / external integrations or a regulated regime is in scope). The orchestrator delegates to `vibecodekit-hybrid-rri-sec` automatically; no flag changes are needed.
+5. New trigger phrases for sub-skill routing (orchestrator still wins priority):
+   ```
+   rri-sec
+   vibecodekit security audit
+   threat model walk
+   ```
+6. The release-gate JSON gains a fourth gate field — `rri_sec_gate ∈ { 🟢, 🟡, 🔴, null }`. `vibecodekit-hybrid-verify` aggregates it into `release_decision` exactly like the other RRI gates: any 🔴 forces `DO_NOT_SHIP`, any 🟡 forces `SHIP_WITH_FOLLOWUPS`. The Phase 4a Check Run renders an extra `RRI-SEC (security audit)` row in its summary.
+7. If you maintain a programmatic consumer that reads gates, add `rri_sec_gate` to your deserializer:
+   ```ts
+   import { readVibecodekitGateForHud } from 'oh-my-claudecode/hud/omc-state';
+   const gate = readVibecodekitGateForHud(cwd);
+   gate?.rriSecGate; // VibecodekitGateGlyph | null
+   ```
+8. When `OMC_LOCALE=vi`, the agent automatically activates Vietnamese-specific lanes:
+   - PDPL Decree 13/2023 control-evidence rows are mandatory.
+   - CCCD / CMND fields auto-tag PII and require encryption-at-rest evidence.
+   - Diacritic-stripping side-channel check (A8) is added by default.
+   - Telex / VNI input fuzz (A3) is appended to every input-validation walk.
+
 ## Breaking changes between phases
 
-**None.** Phase 2, Phase 3, Phase 4a, Phase 4b, Phase 4c, and Phase 4f are strictly additive. Existing skills, agent names, prompts, templates, and artifacts all continue to work. `HudRenderContext.vibecodekitGate` is optional, so existing HUD mocks/presets compile without modification. Phase 4c does NOT relax or change any field already in `.omc/deliverables.json` — the schema reflects the shape Phase 1–4b were already producing, plus the optional `pattern` and `followups` fields surfaced by examples.
+**None.** Phase 2, Phase 3, Phase 4a, Phase 4b, Phase 4c, Phase 4d, and Phase 4f are strictly additive. Existing skills, agent names, prompts, templates, and artifacts all continue to work. `HudRenderContext.vibecodekitGate` is optional, so existing HUD mocks/presets compile without modification. Phase 4c does NOT relax or change any field already in `.omc/deliverables.json` — the schema reflects the shape Phase 1–4b were already producing, plus the optional `pattern` and `followups` fields surfaced by examples.
 
 If you maintain a vendored copy of OMC and pin agent counts elsewhere, the expected numbers are:
 
-| Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4f |
-|--------|---------|---------|---------|----------|
-| Agents | 20 | 22 | 22 | 22 |
-| Canonical skills | 38 | 41 | 41 | 41 |
-| Skills including aliases | 39 | 42 | 42 | 42 |
-| Passing tests | 8 394 | 8 400 | 8 410 | 8 434 |
+| Metric | Phase 1 | Phase 2 | Phase 3 | Phase 4f | Phase 4d |
+|--------|---------|---------|---------|----------|----------|
+| Agents | 20 | 22 | 22 | 22 | 23 |
+| Canonical skills | 38 | 41 | 41 | 41 | 42 |
+| Skills including aliases | 39 | 42 | 42 | 42 | 43 |
+| Passing tests | 8 394 | 8 400 | 8 410 | 8 434 | ≥8 434 |
 
 ## Rollback
 

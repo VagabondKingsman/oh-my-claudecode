@@ -42,6 +42,7 @@ export interface PluginConfig {
     rriInterviewer?: { model?: string };
     rriTester?: { model?: string };
     rriUxCritic?: { model?: string };
+    rriSecurityAuditor?: { model?: string };
   };
 
   // Feature toggles
@@ -441,6 +442,7 @@ export const KNOWN_AGENT_NAMES = [
   'rriInterviewer',
   'rriTester',
   'rriUxCritic',
+  'rriSecurityAuditor',
 ] as const;
 
 export type KnownAgentName = typeof KNOWN_AGENT_NAMES[number];

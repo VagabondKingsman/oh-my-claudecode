@@ -44,11 +44,12 @@
             "vibecodekit-hybrid-rri-ux",
             "vibecodekit-hybrid-rri-t",
             "vibecodekit-hybrid-rri-ui",
+            "vibecodekit-hybrid-rri-sec",
             "vibecodekit-hybrid-verify"
           ],
-          "agents": ["rri-interviewer", "rri-tester", "rri-ux-critic"],
+          "agents": ["rri-interviewer", "rri-tester", "rri-ux-critic", "rri-security-auditor"],
           "templates": "./templates/vibecodekit-hybrid/",
-          "tags": ["vibecodekit", "rri", "contractor-worker", "flow-physics", "vietnamese"]
+          "tags": ["vibecodekit", "rri", "contractor-worker", "flow-physics", "security", "threat-model", "vietnamese"]
         }
       ]
     }
