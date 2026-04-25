@@ -100,12 +100,14 @@ function copyTemplate(
 function parseScaffoldArgs(args: readonly string[]): { slug: string; locale: 'en' | 'vi' } {
   let slugArg = '';
   let locale: 'en' | 'vi' = 'en';
+  let localeExplicit = false;
   for (let i = 0; i < args.length; i += 1) {
     const a = args[i];
     if (a === '--locale') {
       const v = args[i + 1];
       if (v === 'vi' || v === 'en') {
         locale = v;
+        localeExplicit = true;
         i += 1;
       } else {
         throw new Error(`--locale must be 'en' or 'vi' (got '${v ?? ''}')`);
@@ -114,6 +116,7 @@ function parseScaffoldArgs(args: readonly string[]): { slug: string; locale: 'en
       const v = a.slice('--locale='.length);
       if (v === 'vi' || v === 'en') {
         locale = v;
+        localeExplicit = true;
       } else {
         throw new Error(`--locale must be 'en' or 'vi' (got '${v}')`);
       }
@@ -121,9 +124,14 @@ function parseScaffoldArgs(args: readonly string[]): { slug: string; locale: 'en
       slugArg = a;
     }
   }
-  const envLocale = process.env['OMC_LOCALE'];
-  if ((envLocale === 'vi' || envLocale === 'en') && locale === 'en') {
-    locale = envLocale;
+  // Only consult the env / project signals when the user did not pass an
+  // explicit --locale flag. Use the same resolver as the HUD / status
+  // command so POSIX-style values like 'vi_VN.UTF-8' normalize to 'vi'.
+  if (!localeExplicit) {
+    const resolution = resolveVibecodekitLocale(process.cwd(), process.env);
+    if (resolution.signal !== 'default') {
+      locale = resolution.locale;
+    }
   }
   if (!slugArg) {
     throw new Error('scaffold requires <slug>, e.g. omc vibecodekit scaffold checkout-flow');

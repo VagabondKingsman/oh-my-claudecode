@@ -773,6 +773,13 @@ function resolveConflicts(matches) {
     'ai-slop-cleaner','tdd','code-review','security-review','ultrathink','deepsearch','analyze'];
   resolved.sort((a, b) => priorityOrder.indexOf(a.name) - priorityOrder.indexOf(b.name));
 
+  // The vibecodekit-hybrid orchestrator already invokes every RRI sub-skill
+  // at the correct stage, so standalone sub-skill matches would cause a
+  // redundant second run. Suppress them when the orchestrator is in play.
+  if (resolved.some(m => m.name === 'vibecodekit-hybrid')) {
+    resolved = resolved.filter(m => !m.name.startsWith('vibecodekit-hybrid-rri-'));
+  }
+
   return resolved;
 }
 

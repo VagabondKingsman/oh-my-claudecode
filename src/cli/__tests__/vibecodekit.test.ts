@@ -20,10 +20,25 @@ const PLUGIN_ROOT = join(__dirname, '../../..');
 const CLI_ENTRY = join(PLUGIN_ROOT, 'bridge/cli.cjs');
 
 // CI's `test` job does not run `npm run build` first, so the CLI bridge may be
-// missing when vitest starts. Build it once here so the subprocess tests work
-// in both local and CI environments. Safe for local: noop when the file exists.
+// missing OR stale (earlier commits checked a pre-`vibecodekit-command` bundle
+// into bridge/). Rebuild whenever the bundle does not wire the
+// `vibecodekitCommand` dispatcher so the subprocess tests work in both local
+// and CI environments.
 beforeAll(() => {
-  if (existsSync(CLI_ENTRY)) return;
+  const needsRebuild = (() => {
+    if (!existsSync(CLI_ENTRY)) return true;
+    try {
+      const contents = readFileSync(CLI_ENTRY, 'utf-8');
+      // vibecodekitCommand is the exported dispatcher added in Phase 3; its
+      // presence is the canonical "this bundle understands 'omc vibecodekit'"
+      // signal. Passing keyword hits on `vibecodekit-hybrid` etc. are not
+      // sufficient since those appear in skill metadata even in old bundles.
+      return !contents.includes('vibecodekitCommand');
+    } catch {
+      return true;
+    }
+  })();
+  if (!needsRebuild) return;
   execFileSync('node', [join(PLUGIN_ROOT, 'scripts/build-cli.mjs')], {
     cwd: PLUGIN_ROOT,
     stdio: 'inherit',
@@ -157,6 +172,27 @@ describe('omc vibecodekit CLI', () => {
   it('scaffold picks up OMC_LOCALE=vi when --locale is not passed', () => {
     const env = { ...process.env, OMC_LOCALE: 'vi', OMC_PLUGIN_ROOT: PLUGIN_ROOT };
     execFileSync('node', [CLI_ENTRY, 'vibecodekit', 'scaffold', 'locale-env-test'], {
+      cwd: workDir,
+      env,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    const deliverables = JSON.parse(
+      readFileSync(join(workDir, '.omc/deliverables.json'), 'utf-8')
+    ) as Record<string, unknown>;
+    expect(deliverables.locale).toBe('vi');
+  });
+
+  it('scaffold normalizes POSIX-style OMC_LOCALE values (vi_VN.UTF-8 → vi)', () => {
+    // Vietnamese Linux users routinely export OMC_LOCALE=vi_VN.UTF-8 from
+    // their shell profile; the runtime resolver normalises that to 'vi',
+    // and scaffold must agree so the deliverables.json doesn't silently
+    // fall back to 'en'.
+    const env = {
+      ...process.env,
+      OMC_LOCALE: 'vi_VN.UTF-8',
+      OMC_PLUGIN_ROOT: PLUGIN_ROOT,
+    };
+    execFileSync('node', [CLI_ENTRY, 'vibecodekit', 'scaffold', 'posix-locale-test'], {
       cwd: workDir,
       env,
       stdio: ['ignore', 'pipe', 'pipe'],

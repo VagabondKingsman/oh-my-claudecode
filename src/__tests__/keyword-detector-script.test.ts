@@ -88,6 +88,19 @@ describe('keyword-detector.mjs mode-message dispatch', () => {
     expect(context).toContain('[MAGIC KEYWORD: VIBECODEKIT-HYBRID]');
   });
 
+  it('suppresses RRI sub-skill matches when the orchestrator also matches', () => {
+    // Both the orchestrator (vibecodekit-hybrid) and the RRI-T sub-skill
+    // would match this prompt. The orchestrator already runs every RRI
+    // stage internally, so the standalone sub-skill must be suppressed to
+    // avoid a redundant second invocation.
+    const output = runKeywordDetector('vibecodekit rri-t this build');
+    const context = output.hookSpecificOutput?.additionalContext ?? '';
+
+    expect(context).toContain('[MAGIC KEYWORD: VIBECODEKIT-HYBRID]');
+    expect(context).not.toContain('[MAGIC KEYWORDS DETECTED:');
+    expect(context).not.toContain('name: vibecodekit-hybrid-rri-t');
+  });
+
   it('does not emit or activate ralplan for informational/question mentions', () => {
     const cwd = mkdtempSync(join(tmpdir(), 'keyword-detector-ralplan-info-'));
     const sessionId = 'session-2619-info';
