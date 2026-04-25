@@ -67,6 +67,7 @@ export function buildDefaultConfig(): PluginConfig {
       rriInterviewer: { model: defaultTierModels.MEDIUM },
       rriTester: { model: defaultTierModels.MEDIUM },
       rriUxCritic: { model: defaultTierModels.MEDIUM },
+      rriSecurityAuditor: { model: defaultTierModels.MEDIUM },
     },
     features: {
       parallelExecution: true,
@@ -840,6 +841,10 @@ export function generateConfigSchema(): object {
             properties: { model: { type: "string" } },
           },
           rriUxCritic: {
+            type: "object",
+            properties: { model: { type: "string" } },
+          },
+          rriSecurityAuditor: {
             type: "object",
             properties: { model: { type: "string" } },
           },
