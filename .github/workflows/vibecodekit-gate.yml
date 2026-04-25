@@ -1,0 +1,56 @@
+name: Vibecodekit Gate
+
+# Runs `scripts/vibecodekit-gate-check.mjs` on every PR. The script reads
+# `.omc/deliverables.json` (written by `vibecodekit-hybrid-verify`) and
+# turns the release decision into a GitHub Check:
+#
+#   🟢 SHIP                  → conclusion=success
+#   🟡 SHIP_WITH_FOLLOWUPS   → conclusion=neutral  (override with VCK_STRICT=1)
+#   🔴 DO_NOT_SHIP           → conclusion=failure  (blocks the merge)
+#
+# When the file is absent the workflow passes as "neutral" so repos that
+# haven't adopted the pipeline are not blocked.
+
+on:
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - '.omc/deliverables.json'
+      - '.github/workflows/vibecodekit-gate.yml'
+      - 'scripts/vibecodekit-gate-check.mjs'
+  push:
+    branches: [main, dev]
+    paths:
+      - '.omc/deliverables.json'
+  workflow_dispatch:
+    inputs:
+      strict:
+        description: 'Fail on 🟡 SHIP_WITH_FOLLOWUPS (default: false)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Release gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Vibecodekit release-gate check
+        env:
+          VCK_STRICT: ${{ github.event.inputs.strict == 'true' && '1' || '' }}
+        run: node scripts/vibecodekit-gate-check.mjs

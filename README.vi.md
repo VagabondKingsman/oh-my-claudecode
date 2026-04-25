@@ -164,12 +164,39 @@ Nhiều chiến lược cho nhiều tình huống — từ điều phối dựa 
 
 Kết hợp [phương pháp Chủ thầu–Thợ của Vibecodekit v5](./locale/vi/VIBECODEKIT-HYBRID.vi.md) với runtime OMC: 5 persona RRI × 3 chế độ phỏng vấn, 7 vision pattern (landing / saas / dashboard / blog / portfolio / enterprise-module / custom), verdict 4 mức (PASS / FAIL / PAINFUL / MISSING), template TIP & Completion Report chuẩn hoá.
 
+Phase 2 bổ sung 3 sub-skill + 2 agent chất lượng:
+
+- `vibecodekit-hybrid-rri-ux` + `rri-ux-critic` — phê bình UX theo Flow Physics (5 UX persona × 7 UX dimension × 8 trục).
+- `vibecodekit-hybrid-rri-t` + `rri-tester` — stress-test 5 persona × 7 dimension × 8 stress axis với verdict 4 mức.
+- `vibecodekit-hybrid-rri-ui` — pipeline UI 5 phase, gắn release gate 6 tiêu chí cho Enterprise SaaS.
+- VERIFY ghi release gate vào `.omc/deliverables.json`; bật `OMC_LOCALE=vi` để mở overlay tiếng Việt (`locale/vi/agents/*.vi.md`, 12 anti-pattern VN bắt buộc).
+
 ```
 vibecodekit build me một landing page cho X
 /oh-my-claudecode:vibecodekit-hybrid --pattern saas --locale vi
+/oh-my-claudecode:vibecodekit-hybrid-rri-ui <slug> --module checkout
+rri-t cho build này                        # chỉ chạy stage adversarial QA
+rri-ux critique màn thanh toán            # chỉ chạy stage critique trước khi code
 ```
 
-Tài liệu tiếng Anh: [`docs/VIBECODEKIT-HYBRID.md`](./docs/VIBECODEKIT-HYBRID.md).
+Phase 3 bổ sung CLI, preset marketplace, ví dụ đầy đủ, auto-detect locale:
+
+- `omc vibecodekit scaffold <slug> [--locale en|vi]` — tạo skeleton `.omc/{research,specs,plans,design,verify}/` + `.omc/deliverables.json`.
+- `omc vibecodekit status` — in release gate hiện tại từ `deliverables.json` (không cần mở Claude).
+- `omc vibecodekit patterns` / `locales` — liệt kê 10 vision pattern và overlay locale.
+- `vibecodekit-hybrid-scan` giờ phát hiện dự án VN-first theo thang tín hiệu xác định (explicit `.omc/locale.json` → `OMC_LOCALE` → `--locale` → heuristic README → heuristic manifest → mặc định `en`), ghi tín hiệu thắng vào scan report và trả locale về orchestrator.
+- Ví dụ đầy đủ tại [`examples/vibecodekit-hybrid/`](./examples/vibecodekit-hybrid/): `landing-vn/` (studio yoga Việt) và `saas-enterprise-module/` (Invoice cho SaaS Việt).
+- Fixture PDF Unicode cho RRI-T tại [`templates/vibecodekit-hybrid/fixtures/pdf-unicode/`](./templates/vibecodekit-hybrid/fixtures/pdf-unicode/).
+- Entry preset marketplace tại [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json) trong `plugins[0].presets[]`.
+
+Phase 4f đưa vibecodekit vào **runtime TypeScript của OMC** (opt-in, không đổi preset hiện tại):
+
+- **Phần tử HUD release-gate** — bật bằng `"vibecodekitGate": true` dưới `omcHud.elements` trong `.claude/omc.jsonc`. Statusline hiển thị gate hiện tại: `🟢 VK:SHIP 36P`, `🟡 VK:FOLLOWUPS 2⚠`, `🔴 VK:DO_NOT_SHIP 3❌`. Reader dùng cùng hợp đồng an-toàn-schema như ralph / autopilot / prd.
+- **Locale resolver runtime** [`src/lib/vibecodekit-locale.ts`](./src/lib/vibecodekit-locale.ts) — một thang tín hiệu xác định dùng chung giữa HUD và CLI (`.omc/locale.json` → `OMC_LOCALE` → mặc định). POSIX locale được chuẩn hoá (`vi_VN.UTF-8 → vi`); locale không hỗ trợ sẽ rớt xuống thay vì đổi hành vi ngấm ngầm.
+- **CLI** — `omc vibecodekit status` giờ in thêm dòng `locale_signal`, khớp đúng cái HUD thấy.
+- **Test** — 24 unit test mới; toàn bộ bộ test pass ở 8 434 test / 8 skipped.
+
+Tài liệu tiếng Anh: [`docs/VIBECODEKIT-HYBRID.md`](./docs/VIBECODEKIT-HYBRID.md). Migration guide: [`docs/VIBECODEKIT-MIGRATION.md`](./docs/VIBECODEKIT-MIGRATION.md). Overview locale: [`locale/vi/README.vi.md`](./locale/vi/README.vi.md).
 
 ### Điều phối thông minh
 
