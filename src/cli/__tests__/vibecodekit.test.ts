@@ -150,6 +150,21 @@ describe('omc vibecodekit CLI', () => {
       'utf-8',
     );
     expect(rriT).toContain('checkout-flow');
+
+    // The RRI specs artifact must use the RRI template (Requirements
+    // Matrix / Decisions Log / Open Questions), not the BUILD-stage TIP
+    // template. An earlier version of scaffold pointed this slot at
+    // tip.md, which leaked "Task ID" / "Assigned worker" placeholders.
+    const rri = readFileSync(
+      join(workDir, '.omc/specs/vibecodekit-hybrid-rri-checkout-flow.md'),
+      'utf-8',
+    );
+    expect(rri).toContain('# RRI Report — checkout-flow');
+    expect(rri).toContain('Requirements Matrix');
+    expect(rri).toContain('Decisions Log');
+    expect(rri).toContain('Open Questions');
+    expect(rri).not.toContain('Task Instruction Pack');
+    expect(rri).not.toContain('Assigned worker');
   });
 
   it('scaffold --locale vi sets locale in deliverables.json', () => {

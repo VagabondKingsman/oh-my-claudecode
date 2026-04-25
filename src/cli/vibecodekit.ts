@@ -163,9 +163,14 @@ function scaffoldCommand(args: readonly string[]): number {
       src: join(templateRoot, 'scan-report.md'),
     },
     {
+      // RRI specs artifact has its own template (Requirements Matrix /
+      // Decisions Log / Open Questions). It is NOT a TIP — TIPs are per-
+      // task instruction packs written during BUILD. Pointing this slot
+      // at tip.md leaks Task ID / Assigned worker placeholders into the
+      // RRI artifact.
       dir: '.omc/specs',
       file: `vibecodekit-hybrid-rri-${slug}.md`,
-      src: join(templateRoot, 'tip.md'),
+      src: join(templateRoot, 'rri-report.md'),
     },
     {
       dir: '.omc/plans',

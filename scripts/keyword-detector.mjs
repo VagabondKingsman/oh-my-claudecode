@@ -953,7 +953,12 @@ async function main() {
     if (hasActionableKeyword(cleanPrompt, /\brri-t\b|\bflow[-\s]?physics[-\s]?test\b/i)) {
       matches.push({ name: 'vibecodekit-hybrid-rri-t', args: '' });
     }
-    if (hasActionableKeyword(cleanPrompt, /\brri-ux\b|\bflow[-\s]?physics(?:[-\s]?critique)?\b/i)) {
+    // Negative lookahead `(?![-\s]?test)` keeps `flow-physics-test` from
+    // also matching this branch — that variant is the RRI-T cue. Without it
+    // both rri-t and rri-ux fire for the same prompt and the orchestrator
+    // suppression below cannot help (it only kicks in when the full
+    // vibecodekit-hybrid keyword is present).
+    if (hasActionableKeyword(cleanPrompt, /\brri-ux\b|\bflow[-\s]?physics(?:[-\s]?critique)?\b(?![-\s]?test)/i)) {
       matches.push({ name: 'vibecodekit-hybrid-rri-ux', args: '' });
     }
     if (hasActionableKeyword(cleanPrompt, /\brri-ui\b|\bui[-\s]?design[-\s]?pipeline\b/i)) {
