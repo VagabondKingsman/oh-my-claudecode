@@ -326,9 +326,43 @@ node scripts/vibecodekit-gate-check.mjs --json
 node scripts/vibecodekit-gate-check.mjs --path subapp/.omc/deliverables.json
 ```
 
+## What Phase 4c delivers (this PR)
+
+Phase 4c stops `.omc/deliverables.json` schema drift before it reaches CI:
+
+- `templates/vibecodekit-hybrid/deliverables.schema.json` — JSON Schema (draft-07) for the deliverable. Pins:
+  - `slug` lowercase-kebab pattern, `locale ∈ {en, vi, ja}`, `pattern` ∈ the 10 vision patterns + `null`.
+  - `verify_gate` and the four `rri_*_gate` fields constrained to `🟢|🟡|🔴` (or `null`).
+  - `release_decision ∈ {SHIP, SHIP_WITH_FOLLOWUPS, DO_NOT_SHIP, null}`.
+  - `verdict_counts` shape (`pass|fail|painful|missing`, all non-negative integers).
+  - `artifact` must live under `.omc/`, `updated_at` must be ISO-8601 UTC.
+  - `additionalProperties: false` everywhere — adding an unknown field fails validation, surfacing schema drift loudly.
+  - Conditional rule: `release_decision ∈ {SHIP_WITH_FOLLOWUPS, DO_NOT_SHIP}` requires a non-empty `followups` array.
+- `src/lib/vibecodekit-deliverables.ts` — Ajv-backed validator (`validateDeliverablesObject`, `validateDeliverablesFile`) reused by the CLI and any future runtime check.
+- `omc vibecodekit validate [<path>]` — CLI wrapper that prints `OK <path>` on pass, lists every violation with its JSON pointer on fail, and uses canonical exit codes (`0` pass, `1` schema fail, `2` missing/unparseable). Drop into the Phase 4a Check Run as an extra step:
+
+  ```bash
+  node bridge/cli.cjs vibecodekit validate
+  ```
+- 14 validator unit tests + 3 CLI smoke tests covering: valid SHIP/SHIP_WITH_FOLLOWUPS shapes, freshly scaffolded null-gate shape, malformed slug/locale/pattern/decision, missing follow-ups when required, unknown top-level keys, malformed timestamp, and missing/unparseable files.
+
+### Using the validator locally
+
+```bash
+# Validate the current run
+omc vibecodekit validate
+
+# Validate a worked example from the repo
+omc vibecodekit validate examples/vibecodekit-hybrid/landing-vn/deliverables.json
+
+# Use it as a pre-commit hook
+echo 'omc vibecodekit validate' >> .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
 ## What is still out of scope
 
-Phase 4a / 4f deliberately stop at the read-only HUD + CI surface. Future phases could:
+Phase 4a / 4c / 4f deliberately stop at the read-only HUD + CI surface. Future phases could:
 
 - Convert the Vietnamese persona banks into a standalone Claude skill plugin.
 - Add a hook surface that blocks `git push` when the gate is 🔴 (opt-in, client-side).

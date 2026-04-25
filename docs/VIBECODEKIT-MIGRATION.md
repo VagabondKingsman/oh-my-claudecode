@@ -129,9 +129,40 @@ Phase 4f wires vibecodekit's release gate and locale resolution directly into th
    const { locale, signal } = resolveVibecodekitLocale();
    ```
 
+## From Phase 4b → Phase 4c
+
+Phase 4c freezes the `.omc/deliverables.json` shape behind a JSON Schema and adds an `omc vibecodekit validate` command so schema drift fails loudly instead of silently producing garbage HUD/CI output.
+
+1. Pull the branch / PR that introduces Phase 4c.
+2. Validate any existing deliverables.json files in your repo:
+   ```bash
+   omc vibecodekit validate
+   omc vibecodekit validate examples/vibecodekit-hybrid/landing-vn/deliverables.json
+   ```
+3. Wire the validator into your Phase 4a CI gate as a pre-step (optional but recommended):
+   ```yaml
+   - name: Schema validate
+     run: |
+       npm ci
+       npm run build
+       node bridge/cli.cjs vibecodekit validate
+   ```
+4. If you maintain a programmatic consumer of the deliverables, point it at the schema or the helper:
+   ```ts
+   import { validateDeliverablesObject } from 'oh-my-claudecode/lib/vibecodekit-deliverables';
+   const result = validateDeliverablesObject(parsed);
+   if (!result.valid) throw new Error(result.errors.map(e => `${e.path}: ${e.message}`).join('\n'));
+   ```
+5. New constraints to know about (only matter if you author deliverables.json by hand):
+   - `slug` must be lowercase-kebab.
+   - `locale ∈ {en, vi, ja}` (Phase 4e adds `ja` upstream — `ja` is reserved here so future fixtures don't fail).
+   - `release_decision ∈ {SHIP, SHIP_WITH_FOLLOWUPS, DO_NOT_SHIP, null}`.
+   - `release_decision ∈ {SHIP_WITH_FOLLOWUPS, DO_NOT_SHIP}` requires a non-empty `followups` array.
+   - `additionalProperties: false` everywhere — adding an unknown field surfaces as a schema error.
+
 ## Breaking changes between phases
 
-**None.** Phase 2, Phase 3, and Phase 4f are strictly additive. Existing skills, agent names, prompts, templates, and artifacts all continue to work. `HudRenderContext.vibecodekitGate` is optional, so existing HUD mocks/presets compile without modification.
+**None.** Phase 2, Phase 3, Phase 4a, Phase 4b, Phase 4c, and Phase 4f are strictly additive. Existing skills, agent names, prompts, templates, and artifacts all continue to work. `HudRenderContext.vibecodekitGate` is optional, so existing HUD mocks/presets compile without modification. Phase 4c does NOT relax or change any field already in `.omc/deliverables.json` — the schema reflects the shape Phase 1–4b were already producing, plus the optional `pattern` and `followups` fields surfaced by examples.
 
 If you maintain a vendored copy of OMC and pin agent counts elsewhere, the expected numbers are:
 

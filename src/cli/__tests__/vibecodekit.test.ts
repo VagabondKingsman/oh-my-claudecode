@@ -10,7 +10,7 @@
  */
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { execFileSync } from 'child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -233,6 +233,41 @@ describe('omc vibecodekit CLI', () => {
       readFileSync(join(workDir, '.omc/deliverables.json'), 'utf-8')
     ) as Record<string, unknown>;
     expect(deliverables.locale).toBe('vi');
+  });
+
+  it('validate accepts a freshly scaffolded deliverables.json', () => {
+    runCli(['vibecodekit', 'scaffold', 'validate-fresh'], workDir);
+    const result = runCli(['vibecodekit', 'validate'], workDir);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('OK');
+    expect(result.stdout).toContain('deliverables.schema.json');
+  });
+
+  it('validate exits 1 when deliverables.json violates the schema', () => {
+    mkdirSync(join(workDir, '.omc'), { recursive: true });
+    writeFileSync(
+      join(workDir, '.omc/deliverables.json'),
+      JSON.stringify({
+        slug: 'bad-slug',
+        locale: 'fr',
+        verify_gate: 'maybe',
+        verdict_counts: { pass: 0, fail: 0, painful: 0, missing: 0 },
+        release_decision: 'PROBABLY',
+        artifact: 'somewhere-else.md',
+        updated_at: '2026/04/24',
+      }),
+      'utf8',
+    );
+    const result = runCli(['vibecodekit', 'validate'], workDir);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('FAIL');
+    expect(result.stderr).toContain('locale');
+  });
+
+  it('validate exits 2 when deliverables.json is missing', () => {
+    const result = runCli(['vibecodekit', 'validate'], workDir);
+    expect(result.status).toBe(2);
+    expect(result.stderr).toContain('not found');
   });
 
   it('unknown subcommand exits non-zero with help', () => {

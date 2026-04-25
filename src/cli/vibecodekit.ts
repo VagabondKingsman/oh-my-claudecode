@@ -3,6 +3,7 @@ import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import chalk from 'chalk';
 import { resolveVibecodekitLocale } from '../lib/vibecodekit-locale.js';
+import { validateDeliverablesFile } from '../lib/vibecodekit-deliverables.js';
 
 /**
  * `omc vibecodekit` — thin CLI surface for the vibecodekit-hybrid preset.
@@ -25,6 +26,7 @@ Usage:
   omc vibecodekit help
   omc vibecodekit scaffold <slug> [--locale en|vi]
   omc vibecodekit status [<slug>]
+  omc vibecodekit validate [<path>]
   omc vibecodekit patterns
   omc vibecodekit locales
 
@@ -34,6 +36,10 @@ Subcommands:
               --locale vi mirrors Vietnamese overlays from locale/vi/ too.
   status      Read .omc/deliverables.json and print the current release gate.
               If <slug> is given, only that slug's gate is printed.
+  validate    Validate .omc/deliverables.json (or the path you pass) against
+              the canonical JSON Schema at templates/vibecodekit-hybrid/
+              deliverables.schema.json. Exits 0 on pass, 1 on schema fail,
+              2 on missing/unparseable file. Used by Phase 4a Check Run.
   patterns    List the 10 vision patterns available under templates/vibecodekit-hybrid/vision-patterns/.
   locales     List available locale overlays under locale/.
 
@@ -304,6 +310,35 @@ function statusCommand(args: readonly string[]): number {
   return 0;
 }
 
+function validateCommand(args: readonly string[]): number {
+  const cwd = process.cwd();
+  const filePath = args[0]
+    ? resolve(cwd, args[0])
+    : resolve(cwd, '.omc/deliverables.json');
+  const result = validateDeliverablesFile(filePath);
+  if (result.fatal) {
+    console.error(chalk.red(`Error: ${result.fatal}`));
+    return 2;
+  }
+  if (result.valid) {
+    console.log(chalk.green(`OK  ${filePath}`));
+    console.log(`    matches templates/vibecodekit-hybrid/deliverables.schema.json`);
+    return 0;
+  }
+  console.error(chalk.red(`FAIL  ${filePath}`));
+  for (const err of result.errors) {
+    const where = err.path || '<root>';
+    console.error(`  ${where}: ${err.message}`);
+  }
+  console.error(
+    chalk.yellow(
+      `\nSchema lives at templates/vibecodekit-hybrid/deliverables.schema.json. ` +
+        `Run \`omc vibecodekit scaffold <slug>\` to regenerate from a known-good template.`,
+    ),
+  );
+  return 1;
+}
+
 function patternsCommand(): number {
   const pluginRoot = findPluginRoot();
   const patternsDir = join(pluginRoot, 'templates', 'vibecodekit-hybrid', 'vision-patterns');
@@ -352,6 +387,9 @@ export async function vibecodekitCommand(rawArgs: readonly string[]): Promise<vo
       break;
     case 'status':
       exitCode = statusCommand(rest);
+      break;
+    case 'validate':
+      exitCode = validateCommand(rest);
       break;
     case 'patterns':
       exitCode = patternsCommand();
