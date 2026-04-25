@@ -156,6 +156,40 @@ describe('vibecodekit-deliverables validator', () => {
     expect(result.fatal).toMatch(/parse/);
   });
 
+  it('accepts every vision pattern that has a template file on disk', () => {
+    // Keep this list synced with templates/vibecodekit-hybrid/vision-patterns/*.md.
+    // The schema enum and the directory contents must agree — drift in either
+    // direction causes scaffolded deliverables to fail validation OR lets
+    // unknown patterns sneak past the gate.
+    const onDisk = [
+      'landing',
+      'saas',
+      'dashboard',
+      'blog',
+      'portfolio',
+      'enterprise-module',
+      'mobile-app',
+      'cli-tool',
+      'data-pipeline',
+      'custom',
+    ] as const;
+    for (const pattern of onDisk) {
+      const result = validateDeliverablesObject(validDeliverables({ pattern }));
+      expect(result.valid, `${pattern}: ${JSON.stringify(result.errors)}`).toBe(true);
+    }
+  });
+
+  it('rejects gate values that include trailing label text', () => {
+    // The HUD reader and CI gate-check exact-match against ['🟢','🟡','🔴'].
+    // A producer that emits "🟢 all green" would silently render as null in
+    // both consumers — schema MUST enforce the exact-match contract.
+    const result = validateDeliverablesObject(
+      validDeliverables({ verify_gate: '🟢 all green' }),
+    );
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.path === '/verify_gate')).toBe(true);
+  });
+
   it('validates the SHIP_WITH_FOLLOWUPS landing-vn example', () => {
     const example = {
       slug: 'landing-vn',

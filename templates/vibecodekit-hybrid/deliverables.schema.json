@@ -34,14 +34,14 @@
         null,
         "landing",
         "saas",
-        "marketplace",
-        "content-platform",
-        "internal-tool",
+        "dashboard",
+        "blog",
+        "portfolio",
         "enterprise-module",
-        "ai-agent",
         "mobile-app",
         "cli-tool",
-        "data-pipeline"
+        "data-pipeline",
+        "custom"
       ]
     },
     "verify_gate": {
@@ -104,9 +104,9 @@
   ],
   "$defs": {
     "gate": {
-      "description": "Stoplight gate. The leading character is the canonical signal; the rest of the string is human-friendly label text.",
+      "description": "Stoplight gate. Canonical glyph only (🟢 / 🟡 / 🔴) or null. Producers MUST emit the bare glyph because both the HUD reader and the CI gate check exact-match against this set.",
       "type": ["string", "null"],
-      "pattern": "^(🟢|🟡|🔴)"
+      "pattern": "^(🟢|🟡|🔴)$"
     },
     "followup": {
       "type": "object",
