@@ -88,10 +88,14 @@ function copyTemplate(
     return { copied: false, reason: 'template missing' };
   }
   let content = readFileSync(srcFile, 'utf8');
+  // Templates under templates/vibecodekit-hybrid/ use mustache-style
+  // placeholders ({{slug}}, {{locale}}, {{date}}). The earlier `<slug>`
+  // regexes never matched, so scaffolded artifacts shipped with literal
+  // `{{slug}}` strings in their headings.
   content = content
-    .replace(/<slug>/g, slug)
-    .replace(/<locale>/g, locale)
-    .replace(/<date>/g, new Date().toISOString().slice(0, 10));
+    .replace(/\{\{slug\}\}/g, slug)
+    .replace(/\{\{locale\}\}/g, locale)
+    .replace(/\{\{date\}\}/g, new Date().toISOString().slice(0, 10));
   ensureDir(dirname(dstFile));
   writeFileSync(dstFile, content, 'utf8');
   return { copied: true };

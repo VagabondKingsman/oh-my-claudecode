@@ -133,6 +133,23 @@ describe('omc vibecodekit CLI', () => {
     expect(deliverables.locale).toBe('en');
     expect(deliverables.verify_gate).toBeNull();
     expect(deliverables.release_decision).toBeNull();
+
+    // Templates use mustache-style {{slug}}/{{locale}}/{{date}} placeholders;
+    // scaffolded artifacts must have those substituted, not copied verbatim.
+    for (const relPath of expectedFiles) {
+      if (!relPath.endsWith('.md')) continue;
+      const body = readFileSync(join(workDir, relPath), 'utf-8');
+      expect(body, `${relPath} still contains an unresolved placeholder`).not.toMatch(
+        /\{\{(?:slug|locale|date)\}\}/
+      );
+    }
+    // And the slug must actually appear in the report headings (e.g.
+    // "# RRI-T Report — checkout-flow") to confirm substitution worked.
+    const rriT = readFileSync(
+      join(workDir, '.omc/verify/vibecodekit-hybrid-rri-t-checkout-flow.md'),
+      'utf-8',
+    );
+    expect(rriT).toContain('checkout-flow');
   });
 
   it('scaffold --locale vi sets locale in deliverables.json', () => {
