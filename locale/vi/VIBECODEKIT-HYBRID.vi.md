@@ -145,7 +145,7 @@ Các cờ hỗ trợ:
 - **CLI `omc vibecodekit`** (Node/Commander) với 4 subcommand:
   - `scaffold <slug> [--locale en|vi]` — tạo skeleton `.omc/{research,specs,plans,design,verify}/` + `.omc/deliverables.json`.
   - `status [<slug>]` — in release gate hiện tại từ `deliverables.json`.
-  - `patterns` — liệt kê 7 vision pattern.
+  - `patterns` — liệt kê 10 vision pattern.
   - `locales` — liệt kê overlay locale (en + vi).
 - **Preset marketplace**: `.claude-plugin/marketplace.json` thêm block `presets` cho `vibecodekit-hybrid` (entry skill, docs, CLI, danh sách skill/agent/template) và tag `vibecodekit` / `rri` / `vietnamese`.
 - **Migration guide** tại `docs/VIBECODEKIT-MIGRATION.md`: pre-vibecodekit → Phase 1 → Phase 2 → Phase 3, kèm bảng số lượng agent/skill và hướng dẫn rollback.

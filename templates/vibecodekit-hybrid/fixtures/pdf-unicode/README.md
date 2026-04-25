@@ -42,8 +42,8 @@ If you have `pdftotext` (poppler) available locally, a one-liner probe is:
 pdftotext -layout build/invoice.pdf - | python3 -c '
 import sys, unicodedata, json
 text = unicodedata.normalize("NFC", sys.stdin.read())
-probes = json.load(open("templates/vibecodekit-hybrid/fixtures/pdf-unicode/probes.json"))
-missing = [p["id"] for p in probes if p["string"] not in text]
+data = json.load(open("templates/vibecodekit-hybrid/fixtures/pdf-unicode/probes.json"))
+missing = [p["id"] for p in data["probes"] if p["string"] not in text]
 print(json.dumps({"missing": missing}))
 '
 ```
