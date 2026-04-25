@@ -49,6 +49,8 @@ export function buildDefaultConfig() {
             critic: { model: defaultTierModels.HIGH },
             documentSpecialist: { model: defaultTierModels.MEDIUM },
             rriInterviewer: { model: defaultTierModels.MEDIUM },
+            rriTester: { model: defaultTierModels.MEDIUM },
+            rriUxCritic: { model: defaultTierModels.MEDIUM },
         },
         features: {
             parallelExecution: true,
@@ -705,6 +707,14 @@ export function generateConfigSchema() {
                         properties: { model: { type: "string" } },
                     },
                     rriInterviewer: {
+                        type: "object",
+                        properties: { model: { type: "string" } },
+                    },
+                    rriTester: {
+                        type: "object",
+                        properties: { model: { type: "string" } },
+                    },
+                    rriUxCritic: {
                         type: "object",
                         properties: { model: { type: "string" } },
                     },

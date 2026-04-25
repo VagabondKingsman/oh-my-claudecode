@@ -23,6 +23,8 @@ export { scientistAgent } from './scientist.js';
 export { exploreAgent } from './explore.js';
 export { tracerAgent } from './tracer.js';
 export { rriInterviewerAgent } from './rri-interviewer.js';
+export { rriTesterAgent } from './rri-tester.js';
+export { rriUxCriticAgent } from './rri-ux-critic.js';
 export { documentSpecialistAgent } from './document-specialist.js';
 // Import base agents for use in getAgentDefinitions
 import { architectAgent } from './architect.js';
@@ -37,6 +39,8 @@ import { scientistAgent } from './scientist.js';
 import { exploreAgent } from './explore.js';
 import { tracerAgent } from './tracer.js';
 import { rriInterviewerAgent } from './rri-interviewer.js';
+import { rriTesterAgent } from './rri-tester.js';
+import { rriUxCriticAgent } from './rri-ux-critic.js';
 import { documentSpecialistAgent } from './document-specialist.js';
 // Re-export loadAgentPrompt (also exported from index.ts)
 export { loadAgentPrompt };
@@ -151,6 +155,8 @@ const AGENT_CONFIG_KEY_MAP = {
     critic: 'critic',
     'document-specialist': 'documentSpecialist',
     'rri-interviewer': 'rriInterviewer',
+    'rri-tester': 'rriTester',
+    'rri-ux-critic': 'rriUxCritic',
 };
 function getConfiguredAgentModel(name, config) {
     const key = AGENT_CONFIG_KEY_MAP[name];
@@ -205,6 +211,8 @@ export function getAgentDefinitions(options) {
         'git-master': gitMasterAgent,
         'code-simplifier': codeSimplifierAgent,
         'rri-interviewer': rriInterviewerAgent,
+        'rri-tester': rriTesterAgent,
+        'rri-ux-critic': rriUxCriticAgent,
         // ============================================================
         // COORDINATION
         // ============================================================

@@ -26,6 +26,8 @@ export { scientistAgent } from './scientist.js';
 export { exploreAgent } from './explore.js';
 export { tracerAgent } from './tracer.js';
 export { rriInterviewerAgent } from './rri-interviewer.js';
+export { rriTesterAgent } from './rri-tester.js';
+export { rriUxCriticAgent } from './rri-ux-critic.js';
 
 export { documentSpecialistAgent } from './document-specialist.js';
 
@@ -42,6 +44,8 @@ import { scientistAgent } from './scientist.js';
 import { exploreAgent } from './explore.js';
 import { tracerAgent } from './tracer.js';
 import { rriInterviewerAgent } from './rri-interviewer.js';
+import { rriTesterAgent } from './rri-tester.js';
+import { rriUxCriticAgent } from './rri-ux-critic.js';
 import { documentSpecialistAgent } from './document-specialist.js';
 
 // Re-export loadAgentPrompt (also exported from index.ts)
@@ -172,6 +176,8 @@ const AGENT_CONFIG_KEY_MAP = {
   critic: 'critic',
   'document-specialist': 'documentSpecialist',
   'rri-interviewer': 'rriInterviewer',
+  'rri-tester': 'rriTester',
+  'rri-ux-critic': 'rriUxCritic',
 } as const satisfies Partial<Record<string, keyof NonNullable<PluginConfig['agents']>>>;
 
 function getConfiguredAgentModel(name: string, config: PluginConfig): string | undefined {
@@ -242,6 +248,8 @@ export function getAgentDefinitions(options?: {
     'git-master': gitMasterAgent,
     'code-simplifier': codeSimplifierAgent,
     'rri-interviewer': rriInterviewerAgent,
+    'rri-tester': rriTesterAgent,
+    'rri-ux-critic': rriUxCriticAgent,
 
     // ============================================================
     // COORDINATION

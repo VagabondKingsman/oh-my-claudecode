@@ -27,6 +27,7 @@ import {
   readUltraworkStateForHud,
   readPrdStateForHud,
   readAutopilotStateForHud,
+  readVibecodekitGateForHud,
 } from "./omc-state.js";
 import { getUsage } from "./usage-api.js";
 import { executeCustomProvider } from "./custom-rate-provider.js";
@@ -308,6 +309,9 @@ async function main(watchMode = false, skipInit = false): Promise<void> {
       cwd,
       currentSessionId ?? undefined,
     );
+    const vibecodekitGate = config.elements.vibecodekitGate
+      ? readVibecodekitGateForHud(cwd)
+      : null;
 
     // Read HUD state for background tasks
     const hudState = readHudState(cwd, currentSessionId ?? undefined);
@@ -426,6 +430,7 @@ async function main(watchMode = false, skipInit = false): Promise<void> {
       ultrawork,
       prd,
       autopilot,
+      vibecodekitGate,
       activeAgents: transcriptData.agents.filter((a) => a.status === "running"),
       todos: transcriptData.todos,
       backgroundTasks: getRunningTasks(hudState),
