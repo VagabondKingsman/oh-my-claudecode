@@ -242,7 +242,7 @@ Multiple strategies for different use cases — from Team-backed orchestration t
 
 ### Vibecodekit Hybrid preset
 
-Combines the [Vibecodekit v5 Contractor–Worker methodology](./docs/VIBECODEKIT-HYBRID.md) with OMC's runtime: 5 RRI personas × 3 interview modes, 7 vision patterns (landing / saas / dashboard / blog / portfolio / enterprise-module / custom), 4-level verify verdict (PASS / FAIL / PAINFUL / MISSING), and standardized TIP / Completion Report artifacts.
+Combines the [Vibecodekit v5 Contractor–Worker methodology](./docs/VIBECODEKIT-HYBRID.md) with OMC's runtime: 5 RRI personas × 3 interview modes, 10 vision patterns (landing / saas / dashboard / blog / portfolio / enterprise-module / mobile-app / cli-tool / data-pipeline / custom), 4-level verify verdict (PASS / FAIL / PAINFUL / MISSING), and standardized TIP / Completion Report artifacts.
 
 Phase 2 adds three additional sub-skills and two quality-focused agents:
 

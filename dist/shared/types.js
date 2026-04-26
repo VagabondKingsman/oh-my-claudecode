@@ -47,5 +47,6 @@ export const KNOWN_AGENT_NAMES = [
     'rriInterviewer',
     'rriTester',
     'rriUxCritic',
+    'rriSecurityAuditor',
 ];
 //# sourceMappingURL=types.js.map

@@ -49,7 +49,7 @@ Với dự án nặng UI/UX, Phase 2 sẽ bổ sung 5 persona RRI-UX (Speed Runn
 - **Guided**: đưa 2-3 phương án cân bằng, kèm pros/cons, không đề xuất.
 - **Explore**: hỏi mở trước, hội tụ về phương án sau. Dùng cho dự án mới, user chưa có mental model.
 
-## 7 Vision Pattern
+## 10 Vision Pattern
 
 Mỗi pattern trong `templates/vibecodekit-hybrid/vision-patterns/` có layout chuẩn, stack mặc định (đề xuất, không bắt buộc), non-goals, persona focus, Flow Physics, và khung acceptance:
 
@@ -59,6 +59,9 @@ Mỗi pattern trong `templates/vibecodekit-hybrid/vision-patterns/` có layout c
 - `blog.md` — blog / content site.
 - `portfolio.md` — portfolio cá nhân / studio.
 - `enterprise-module.md` — module mới trong ứng dụng doanh nghiệp có sẵn.
+- `mobile-app.md` — ứng dụng di động (React Native / Flutter / native).
+- `cli-tool.md` — công cụ dòng lệnh / developer tool.
+- `data-pipeline.md` — pipeline ETL/ELT xử lý dữ liệu.
 - `custom.md` — escape hatch có chủ đích khi không pattern nào vừa.
 
 ## 4 mức verdict khi VERIFY
@@ -81,7 +84,7 @@ Tất cả nằm dưới `templates/vibecodekit-hybrid/`:
 - `completion-report.md` — báo cáo từ Thợ về Chủ thầu.
 - `blueprint.md` — Blueprint có sẵn RRI Requirements Matrix + Task Decomposition Preview.
 - `verify-report.md` — báo cáo Verify với 4 mức verdict.
-- `vision-patterns/*.md` — 7 vision pattern ở trên.
+- `vision-patterns/*.md` — 10 vision pattern ở trên.
 
 ## Cách gọi
 
@@ -105,8 +108,8 @@ Các cờ hỗ trợ:
 
 - `--interactive` (mặc định): dừng ở cổng APPROVED sau BLUEPRINT.
 - `--auto`: bỏ cổng APPROVED, coi Blueprint là đã duyệt.
-- `--pattern <landing|saas|dashboard|blog|portfolio|enterprise-module|custom>`: ép pattern.
-- `--locale <en|vi>`: ép locale (nếu không, đọc từ README + `OMC_LOCALE`).
+- `--pattern <landing|saas|dashboard|blog|portfolio|enterprise-module|mobile-app|cli-tool|data-pipeline|custom>`: ép pattern.
+- `--locale <en|vi|ja>`: ép locale (nếu không, đọc từ README + `OMC_LOCALE`).
 
 ## Liên hệ với các skill OMC đang có
 
@@ -126,7 +129,7 @@ Các cờ hỗ trợ:
 
 - 5 skill: `vibecodekit-hybrid` + 4 sub (`-scan`, `-rri`, `-vision`, `-verify`).
 - 1 agent: `rri-interviewer` (5 persona × 3 mode).
-- 11 template: scan-report, tip, completion-report, blueprint, verify-report, 7 vision pattern.
+- 14 template: scan-report, tip, completion-report, blueprint, verify-report, 10 vision pattern (landing / saas / dashboard / blog / portfolio / enterprise-module / mobile-app / cli-tool / data-pipeline / custom).
 - Tích hợp keyword-detector: `vibecodekit`, `vibecodekit-hybrid`, `vibecode-master`.
 - Docs: file tiếng Anh `docs/VIBECODEKIT-HYBRID.md` + file này (Việt).
 

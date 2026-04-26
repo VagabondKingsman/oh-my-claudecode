@@ -35,7 +35,7 @@ Post-build adversarial QA pass that proves the system holds up under real-world 
 </Execution_Policy>
 
 <Steps>
-1. Resolve `<slug>`; locate Blueprint (`.omc/plans/blueprint-<slug>.md`) and RRI artifact (`.omc/specs/vibecodekit-hybrid-rri-<slug>.md`). Fail loudly if either is missing.
+1. Resolve `<slug>`; locate Blueprint (`.omc/plans/vibecodekit-hybrid-<slug>.md`) and RRI artifact (`.omc/specs/vibecodekit-hybrid-rri-<slug>.md`). Fail loudly if either is missing.
 2. Compute the target modules to cover (default: all P0 + P1 modules from the Blueprint).
 3. Delegate:
    ```

@@ -13,6 +13,7 @@ export const DEFAULT_ELEMENT_ORDER = {
     main: [
         'omcLabel', 'rateLimits', 'customBuckets', 'permission', 'thinking',
         'promptTime', 'session', 'tokens', 'ralph', 'autopilot', 'prd',
+        'vibecodekitGate',
         'skills', 'lastSkill', 'contextBar', 'agents', 'background',
         'callCounts', 'lastTool', 'sessionSummary',
     ],

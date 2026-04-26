@@ -27,6 +27,35 @@ export declare function readPrdStateForHud(directory: string): PrdStateForHud | 
  */
 export declare function readAutopilotStateForHud(directory: string, sessionId?: string): AutopilotStateForHud | null;
 /**
+ * Canonical gate glyphs written by `vibecodekit-hybrid-verify`.
+ * Anything else → treat as unknown.
+ */
+export type VibecodekitGateGlyph = '🟢' | '🟡' | '🔴';
+export type VibecodekitReleaseDecision = 'SHIP' | 'SHIP_WITH_FOLLOWUPS' | 'DO_NOT_SHIP';
+export interface VibecodekitGateForHud {
+    slug: string | null;
+    verifyGate: VibecodekitGateGlyph | null;
+    releaseDecision: VibecodekitReleaseDecision | null;
+    verdictCounts: {
+        pass: number;
+        fail: number;
+        painful: number;
+        missing: number;
+    };
+    rriTGate: VibecodekitGateGlyph | null;
+    rriUxGate: VibecodekitGateGlyph | null;
+    rriUiGate: VibecodekitGateGlyph | null;
+    rriSecGate: VibecodekitGateGlyph | null;
+}
+/**
+ * Read the vibecodekit release gate from `.omc/deliverables.json`.
+ *
+ * Returns null when the file is absent, unparseable, or when it contains
+ * no usable gate signal. This matches the behaviour of the other HUD
+ * state readers (ralph, autopilot, prd) — HUD code never throws.
+ */
+export declare function readVibecodekitGateForHud(directory: string): VibecodekitGateForHud | null;
+/**
  * Check if any OMC mode is currently active
  */
 export declare function isAnyModeActive(directory: string, sessionId?: string): boolean;

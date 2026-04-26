@@ -37,7 +37,7 @@ Pre-release security walk that proves the system can defend itself against reali
 </Execution_Policy>
 
 <Steps>
-1. Resolve `<slug>`; locate Blueprint (`.omc/plans/blueprint-<slug>.md`), RRI artifact (`.omc/specs/vibecodekit-hybrid-rri-<slug>.md`), and SCAN report (`.omc/specs/vibecodekit-hybrid-scan-<slug>.md`). Fail loudly if Blueprint or RRI is missing; SCAN may be absent for greenfield.
+1. Resolve `<slug>`; locate Blueprint (`.omc/plans/vibecodekit-hybrid-<slug>.md`), RRI artifact (`.omc/specs/vibecodekit-hybrid-rri-<slug>.md`), and SCAN report (`.omc/specs/vibecodekit-hybrid-scan-<slug>.md`). Fail loudly if Blueprint or RRI is missing; SCAN may be absent for greenfield.
 2. Compute the target modules (default: every P0 + P1 module that handles authn / authz / payments / PII / uploads / external integrations).
 3. Delegate:
    ```

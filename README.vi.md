@@ -162,7 +162,7 @@ Nhiều chiến lược cho nhiều tình huống — từ điều phối dựa 
 
 ### Preset Vibecodekit Hybrid
 
-Kết hợp [phương pháp Chủ thầu–Thợ của Vibecodekit v5](./locale/vi/VIBECODEKIT-HYBRID.vi.md) với runtime OMC: 5 persona RRI × 3 chế độ phỏng vấn, 7 vision pattern (landing / saas / dashboard / blog / portfolio / enterprise-module / custom), verdict 4 mức (PASS / FAIL / PAINFUL / MISSING), template TIP & Completion Report chuẩn hoá.
+Kết hợp [phương pháp Chủ thầu–Thợ của Vibecodekit v5](./locale/vi/VIBECODEKIT-HYBRID.vi.md) với runtime OMC: 5 persona RRI × 3 chế độ phỏng vấn, 10 vision pattern (landing / saas / dashboard / blog / portfolio / enterprise-module / mobile-app / cli-tool / data-pipeline / custom), verdict 4 mức (PASS / FAIL / PAINFUL / MISSING), template TIP & Completion Report chuẩn hoá.
 
 Phase 2 bổ sung 3 sub-skill + 2 agent chất lượng:
 
