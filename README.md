@@ -242,14 +242,45 @@ Multiple strategies for different use cases — from Team-backed orchestration t
 
 ### Vibecodekit Hybrid preset
 
-Combines the [Vibecodekit v5 Contractor–Worker methodology](./docs/VIBECODEKIT-HYBRID.md) with OMC's runtime: 5 RRI personas × 3 interview modes, 7 vision patterns (landing / saas / dashboard / blog / portfolio / enterprise-module / custom), 4-level verify verdict (PASS / FAIL / PAINFUL / MISSING), and standardized TIP / Completion Report artifacts.
+Combines the [Vibecodekit v5 Contractor–Worker methodology](./docs/VIBECODEKIT-HYBRID.md) with OMC's runtime: 5 RRI personas × 3 interview modes, 10 vision patterns (landing / saas / dashboard / blog / portfolio / enterprise-module / mobile-app / cli-tool / data-pipeline / custom), 4-level verify verdict (PASS / FAIL / PAINFUL / MISSING), and standardized TIP / Completion Report artifacts.
+
+Phase 2 adds three additional sub-skills and two quality-focused agents:
+
+- `vibecodekit-hybrid-rri-ux` + `rri-ux-critic` — Flow-Physics UX critique (5 UX personas × 7 UX dimensions × 8 axes).
+- `vibecodekit-hybrid-rri-t` + `rri-tester` — adversarial QA walk (5 testing personas × 7 dimensions × 8 stress axes, 4-level verdict per test case).
+- `vibecodekit-hybrid-rri-ui` — 5-phase UI design pipeline that composes the two above with a 6-criterion release gate for Enterprise SaaS UI.
+- VERIFY now emits a structured release gate into `.omc/deliverables.json`; `OMC_LOCALE=vi` unlocks the Vietnamese overlay (`locale/vi/agents/*.vi.md`, 12-item Vietnamese anti-pattern checklist).
 
 ```
 vibecodekit build me a landing page for X
 /oh-my-claudecode:vibecodekit-hybrid --pattern saas --locale vi
+/oh-my-claudecode:vibecodekit-hybrid-rri-ui <slug> --module checkout
+rri-t this build                        # sub-skill routing (adversarial QA only)
+rri-ux critique the checkout flow       # sub-skill routing (pre-design UX critique)
 ```
 
-Vietnamese docs: [`locale/vi/VIBECODEKIT-HYBRID.vi.md`](./locale/vi/VIBECODEKIT-HYBRID.vi.md).
+Phase 3 adds a thin CLI surface, a marketplace preset entry, worked examples, and locale auto-detection:
+
+- `omc vibecodekit scaffold <slug> [--locale en|vi]` — seed `.omc/{research,specs,plans,design,verify}/` skeleton and `.omc/deliverables.json`.
+- `omc vibecodekit status` — pretty-print the current release gate without opening Claude.
+- `omc vibecodekit patterns` / `locales` — list the 10 vision patterns and the available locale overlays.
+- `vibecodekit-hybrid-scan` now detects Vietnamese projects deterministically (explicit `.omc/locale.json` → `OMC_LOCALE` → `--locale` → README diacritic-density heuristic → `package.json` / `pyproject.toml` / `Cargo.toml` description heuristic → default `en`), records the winning signal in the scan report, and echoes the locale back so all downstream stages inherit it.
+- Worked examples under [`examples/vibecodekit-hybrid/`](./examples/vibecodekit-hybrid/): `landing-vn/` (Vietnamese yoga studio landing) and `saas-enterprise-module/` (invoice module for a VN Enterprise SaaS).
+- PDF-export Unicode fixtures at [`templates/vibecodekit-hybrid/fixtures/pdf-unicode/`](./templates/vibecodekit-hybrid/fixtures/pdf-unicode/) wired into the RRI-T Vietnamese rubric.
+- Marketplace preset entry at [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json) under `plugins[0].presets[]`.
+
+Phase 4f promotes vibecodekit from skill-pack to **first-class runtime citizen** (opt-in, no preset change):
+
+- **HUD release-gate element** — add `"vibecodekitGate": true` under `omcHud.elements` in `.claude/omc.jsonc` to surface the current gate directly on the statusline (`🟢 VK:SHIP 36P`, `🟡 VK:FOLLOWUPS 2⚠`, `🔴 VK:DO_NOT_SHIP 3❌`). The reader is schema-safe and mirrors the contract used by the ralph / autopilot / prd HUD readers.
+- **Runtime locale resolver** [`src/lib/vibecodekit-locale.ts`](./src/lib/vibecodekit-locale.ts) — one deterministic signal ladder shared by the HUD and the CLI (`.omc/locale.json` → `OMC_LOCALE` → default). POSIX locales normalise (`vi_VN.UTF-8 → vi`); unsupported locales fall through rather than silently changing behaviour.
+- **CLI** — `omc vibecodekit status` now prints `locale_signal` alongside the gate so the CLI output matches what the HUD sees.
+- **Tests** — 24 new unit tests; total suite passes at 8 434 tests / 8 skipped.
+
+Phase 4e adds a third locale overlay to prove the locale-overlay pattern is reusable beyond Vietnamese:
+
+- **Japanese overlay** at [`locale/ja/`](./locale/ja/) — `OMC_LOCALE=ja` (or `--locale ja`, or `.omc/locale.json` `{"locale":"ja"}`) enables 12 Japanese-specific UX anti-patterns (敬語混在、半角カナ事故、JIS X 0212/0213 外字、和暦/西暦混在、〒住所欠落、PDF 文字化け、絵文字差異、人名 NFC 安定性、苗字/名前並び、CSV 化け、IME compositionend、ユニコード正規化境界), 5 Japanese personas, and APPI (個人情報保護法) Article 17/21/28 + マイナンバー法 control-evidence rows in the RRI-SEC report.
+
+Locale docs: [`locale/vi/`](./locale/vi/) (Vietnamese), [`locale/ja/`](./locale/ja/) (Japanese). Migration guide: [`docs/VIBECODEKIT-MIGRATION.md`](./docs/VIBECODEKIT-MIGRATION.md).
 
 ### Intelligent Orchestration
 

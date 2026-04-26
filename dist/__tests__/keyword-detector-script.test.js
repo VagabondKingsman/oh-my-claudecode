@@ -66,6 +66,36 @@ describe('keyword-detector.mjs mode-message dispatch', () => {
         const context = output.hookSpecificOutput?.additionalContext ?? '';
         expect(context).toContain('[MAGIC KEYWORD: VIBECODEKIT-HYBRID]');
     });
+    it('routes flow-physics-test to RRI-T only, not RRI-UX', () => {
+        // The RRI-UX regex used to over-match `flow-physics-test` because
+        // `(?:[-\s]?critique)?` was optional and `\b` fired after `physics`.
+        // A negative lookahead `(?![-\s]?test)` now scopes the rri-ux branch
+        // to non-test variants. The user typed an RRI-T cue, so we must emit
+        // exactly one invocation: vibecodekit-hybrid-rri-t.
+        const output = runKeywordDetector('flow-physics-test the checkout flow');
+        const context = output.hookSpecificOutput?.additionalContext ?? '';
+        expect(context).toContain('VIBECODEKIT-HYBRID-RRI-T');
+        expect(context).not.toContain('VIBECODEKIT-HYBRID-RRI-UX');
+        expect(context).not.toContain('[MAGIC KEYWORDS DETECTED:');
+    });
+    it('still routes flow-physics-critique to RRI-UX', () => {
+        // The negative lookahead must not regress the legitimate RRI-UX cue.
+        const output = runKeywordDetector('please run flow-physics-critique on the dashboard');
+        const context = output.hookSpecificOutput?.additionalContext ?? '';
+        expect(context).toContain('VIBECODEKIT-HYBRID-RRI-UX');
+        expect(context).not.toContain('VIBECODEKIT-HYBRID-RRI-T');
+    });
+    it('suppresses RRI sub-skill matches when the orchestrator also matches', () => {
+        // Both the orchestrator (vibecodekit-hybrid) and the RRI-T sub-skill
+        // would match this prompt. The orchestrator already runs every RRI
+        // stage internally, so the standalone sub-skill must be suppressed to
+        // avoid a redundant second invocation.
+        const output = runKeywordDetector('vibecodekit rri-t this build');
+        const context = output.hookSpecificOutput?.additionalContext ?? '';
+        expect(context).toContain('[MAGIC KEYWORD: VIBECODEKIT-HYBRID]');
+        expect(context).not.toContain('[MAGIC KEYWORDS DETECTED:');
+        expect(context).not.toContain('name: vibecodekit-hybrid-rri-t');
+    });
     it('does not emit or activate ralplan for informational/question mentions', () => {
         const cwd = mkdtempSync(join(tmpdir(), 'keyword-detector-ralplan-info-'));
         const sessionId = 'session-2619-info';

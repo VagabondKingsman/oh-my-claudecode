@@ -75,8 +75,8 @@ describe('Builtin Skills', () => {
     describe('createBuiltinSkills()', () => {
         it('should return correct number of skills (38 canonical + 1 alias)', () => {
             const skills = createBuiltinSkills();
-            // 39 entries: 38 canonical skills + 1 deprecated alias (psm)
-            expect(skills).toHaveLength(39);
+            // 43 entries: 42 canonical skills + 1 deprecated alias (psm)
+            expect(skills).toHaveLength(43);
         });
         it('should return an array of BuiltinSkill objects', () => {
             const skills = createBuiltinSkills();
@@ -152,6 +152,10 @@ describe('Builtin Skills', () => {
                 'ultrawork',
                 'vibecodekit-hybrid',
                 'vibecodekit-hybrid-rri',
+                'vibecodekit-hybrid-rri-sec',
+                'vibecodekit-hybrid-rri-t',
+                'vibecodekit-hybrid-rri-ui',
+                'vibecodekit-hybrid-rri-ux',
                 'vibecodekit-hybrid-scan',
                 'vibecodekit-hybrid-verify',
                 'vibecodekit-hybrid-vision',
@@ -451,7 +455,7 @@ describe('Builtin Skills', () => {
     describe('listBuiltinSkillNames()', () => {
         it('should return canonical skill names by default', () => {
             const names = listBuiltinSkillNames();
-            expect(names).toHaveLength(38);
+            expect(names).toHaveLength(42);
             expect(names).toContain('ai-slop-cleaner');
             expect(names).toContain('ask');
             expect(names).toContain('autopilot');
@@ -482,7 +486,7 @@ describe('Builtin Skills', () => {
         it('should include aliases when explicitly requested', () => {
             const names = listBuiltinSkillNames({ includeAliases: true });
             // swarm alias removed in #1131, psm still exists
-            expect(names).toHaveLength(39);
+            expect(names).toHaveLength(43);
             expect(names).toContain('ai-slop-cleaner');
             expect(names).toContain('trace');
             expect(names).toContain('visual-verdict');

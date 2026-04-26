@@ -49,7 +49,7 @@ Với dự án nặng UI/UX, Phase 2 sẽ bổ sung 5 persona RRI-UX (Speed Runn
 - **Guided**: đưa 2-3 phương án cân bằng, kèm pros/cons, không đề xuất.
 - **Explore**: hỏi mở trước, hội tụ về phương án sau. Dùng cho dự án mới, user chưa có mental model.
 
-## 7 Vision Pattern
+## 10 Vision Pattern
 
 Mỗi pattern trong `templates/vibecodekit-hybrid/vision-patterns/` có layout chuẩn, stack mặc định (đề xuất, không bắt buộc), non-goals, persona focus, Flow Physics, và khung acceptance:
 
@@ -59,6 +59,9 @@ Mỗi pattern trong `templates/vibecodekit-hybrid/vision-patterns/` có layout c
 - `blog.md` — blog / content site.
 - `portfolio.md` — portfolio cá nhân / studio.
 - `enterprise-module.md` — module mới trong ứng dụng doanh nghiệp có sẵn.
+- `mobile-app.md` — ứng dụng di động (React Native / Flutter / native).
+- `cli-tool.md` — công cụ dòng lệnh / developer tool.
+- `data-pipeline.md` — pipeline ETL/ELT xử lý dữ liệu.
 - `custom.md` — escape hatch có chủ đích khi không pattern nào vừa.
 
 ## 4 mức verdict khi VERIFY
@@ -81,7 +84,7 @@ Tất cả nằm dưới `templates/vibecodekit-hybrid/`:
 - `completion-report.md` — báo cáo từ Thợ về Chủ thầu.
 - `blueprint.md` — Blueprint có sẵn RRI Requirements Matrix + Task Decomposition Preview.
 - `verify-report.md` — báo cáo Verify với 4 mức verdict.
-- `vision-patterns/*.md` — 7 vision pattern ở trên.
+- `vision-patterns/*.md` — 10 vision pattern ở trên.
 
 ## Cách gọi
 
@@ -105,8 +108,8 @@ Các cờ hỗ trợ:
 
 - `--interactive` (mặc định): dừng ở cổng APPROVED sau BLUEPRINT.
 - `--auto`: bỏ cổng APPROVED, coi Blueprint là đã duyệt.
-- `--pattern <landing|saas|dashboard|blog|portfolio|enterprise-module|custom>`: ép pattern.
-- `--locale <en|vi>`: ép locale (nếu không, đọc từ README + `OMC_LOCALE`).
+- `--pattern <landing|saas|dashboard|blog|portfolio|enterprise-module|mobile-app|cli-tool|data-pipeline|custom>`: ép pattern.
+- `--locale <en|vi|ja>`: ép locale (nếu không, đọc từ README + `OMC_LOCALE`).
 
 ## Liên hệ với các skill OMC đang có
 
@@ -126,15 +129,120 @@ Các cờ hỗ trợ:
 
 - 5 skill: `vibecodekit-hybrid` + 4 sub (`-scan`, `-rri`, `-vision`, `-verify`).
 - 1 agent: `rri-interviewer` (5 persona × 3 mode).
-- 11 template: scan-report, tip, completion-report, blueprint, verify-report, 7 vision pattern.
+- 14 template: scan-report, tip, completion-report, blueprint, verify-report, 10 vision pattern (landing / saas / dashboard / blog / portfolio / enterprise-module / mobile-app / cli-tool / data-pipeline / custom).
 - Tích hợp keyword-detector: `vibecodekit`, `vibecodekit-hybrid`, `vibecode-master`.
 - Docs: file tiếng Anh `docs/VIBECODEKIT-HYBRID.md` + file này (Việt).
 
-## Phase 2 & 3 sắp tới
+## Phase 2 đã bàn giao (PR này)
 
-- **Phase 2**: agent `rri-tester`, `rri-ux-critic`; skill RRI-UI; opt-in Vietnamese locale rules qua `OMC_LOCALE=vi`; 4-level verdict được lưu vào `deliverables.json`.
-- **Phase 3**: CLI `omc vibecodekit`, preset marketplace, migration guide, ví dụ đầy đủ.
+- Thêm 3 skill: `vibecodekit-hybrid-rri-t`, `vibecodekit-hybrid-rri-ux`, `vibecodekit-hybrid-rri-ui`.
+- Thêm 2 agent: `rri-tester` (5 persona test × 7 dimension × 8 stress axis) và `rri-ux-critic` (5 UX persona × 7 UX dimension × 8 trục Flow Physics).
+- Thêm 3 template: `rri-t-report.md`, `rri-ux-report.md`, `rri-ui-report.md`.
+- Orchestrator pipeline gắn thêm Stage 4b (RRI-UX trước khi code) và Stage 6b (RRI-T sau BUILD).
+- VERIFY ghi quyết định release vào `.omc/deliverables.json` (`verify_gate`, `verdict_counts`, `release_decision`, các gate con `rri_t_gate` / `rri_ux_gate` / `rri_ui_gate`).
+- Keyword detector bổ sung pattern `rri-t`, `rri-ux`, `rri-ui`, `ui-design-pipeline`, `flow-physics(-critique|-test)?` (orchestrator vẫn có priority cao hơn).
+- Opt-in Vietnamese qua `OMC_LOCALE=vi`: overlay tại `locale/vi/agents/*.vi.md`, `locale/vi/skills/*.vi.md`, `locale/vi/README.vi.md` (12 anti-pattern VN bắt buộc).
+
+## Phase 3 đã bàn giao (PR này)
+
+- **CLI `omc vibecodekit`** (Node/Commander) với 4 subcommand:
+  - `scaffold <slug> [--locale en|vi]` — tạo skeleton `.omc/{research,specs,plans,design,verify}/` + `.omc/deliverables.json`.
+  - `status [<slug>]` — in release gate hiện tại từ `deliverables.json`.
+  - `patterns` — liệt kê 10 vision pattern.
+  - `locales` — liệt kê overlay locale (en + vi).
+- **Preset marketplace**: `.claude-plugin/marketplace.json` thêm block `presets` cho `vibecodekit-hybrid` (entry skill, docs, CLI, danh sách skill/agent/template) và tag `vibecodekit` / `rri` / `vietnamese`.
+- **Migration guide** tại `docs/VIBECODEKIT-MIGRATION.md`: pre-vibecodekit → Phase 1 → Phase 2 → Phase 3, kèm bảng số lượng agent/skill và hướng dẫn rollback.
+- **Ví dụ đầy đủ** dưới `examples/vibecodekit-hybrid/`:
+  - `landing-vn/` — landing page studio yoga Việt (locale vi, pattern landing, gate 🟡 → SHIP_WITH_FOLLOWUPS).
+  - `saas-enterprise-module/` — module Invoice cho SaaS Việt (locale vi, pattern enterprise-module, 3 gate đều 🟢 → SHIP).
+- **Auto-detect locale tại SCAN**: thứ tự tín hiệu xác định `.omc/locale.json` → `OMC_LOCALE` → `--locale` → heuristic README (diacritic density > 8 %) → heuristic manifest (`package.json`/`pyproject.toml`/`Cargo.toml`) → mặc định `en`. Tín hiệu thắng + bằng chứng được ghi vào section 8 của scan report; locale non-default được truyền lại cho orchestrator để các stage sau thừa kế.
+- **Fixture PDF Unicode cho RRI-T**: `templates/vibecodekit-hybrid/fixtures/pdf-unicode/` với 8 chuỗi probe (`PDF-VN-01` … `PDF-VN-08`) + `probes.json` có cờ `fail_if_missing` để phân biệt trường danh tính/pháp lý (FAIL nếu vỡ) và mất dấu thẩm mỹ (PAINFUL).
+
+### Ví dụ CLI
+
+```bash
+# scaffold artifact, không cần mở Claude
+omc vibecodekit scaffold checkout-flow
+omc vibecodekit scaffold landing-vn --locale vi
+
+# xem release gate hiện tại
+omc vibecodekit status
+
+# liệt kê pattern + locale có sẵn
+omc vibecodekit patterns
+omc vibecodekit locales
+```
+
+### Thang tín hiệu locale (từ cao xuống thấp)
+
+| Ưu tiên | Tín hiệu | Nguồn | Ghi chú |
+|---------|----------|-------|---------|
+| 1 | `omc-locale-json` | `.omc/locale.json` | Ghi đè tường minh, luôn thắng |
+| 2 | `env:OMC_LOCALE` | Biến môi trường | Giữ qua nhiều phiên trong cùng shell |
+| 3 | `flag:--locale` | CLI / invocation flag | Ghi đè cho một run |
+| 4 | `readme-heuristic` | `README.md` (fallback `README.vi.md`) | Tỷ lệ nguyên âm mang dấu > 8 % trong 400 ký tự bất kỳ |
+| 5 | `manifest-heuristic` | `package.json` / `pyproject.toml` / `Cargo.toml` | Dấu tiếng Việt trong description / author / keywords |
+| 6 | `default` | — | Tiếng Anh |
+
+## Phase 4f đã bàn giao (PR này)
+
+Phase 4f lần đầu tiên đưa hai trạng thái của vibecodekit vào **runtime TypeScript của OMC** (không còn chỉ là skill), nhưng vẫn opt-in nên không phá vỡ preset HUD hiện tại:
+
+- **Locale resolver runtime** `src/lib/vibecodekit-locale.ts` — xuất `resolveVibecodekitLocale(cwd?, env?)` và `getVibecodekitLocale()`. Thang tín hiệu runtime hẹp hơn SCAN (runtime không được làm heuristic filesystem mỗi lần render):
+  1. `.omc/locale.json` ghi đè tường minh
+  2. Biến môi trường `OMC_LOCALE`
+  3. Mặc định (`en`)
+
+  Locale hỗ trợ được chuẩn hoá từ dạng POSIX (ví dụ `vi_VN.UTF-8 → vi`). Locale không được hỗ trợ sẽ rớt xuống tín hiệu kế — không bao giờ đổi hành vi ngấm ngầm.
+- **Reader release-gate cho HUD** `src/hud/omc-state.ts :: readVibecodekitGateForHud(cwd)` — đọc `.omc/deliverables.json` an toàn (JSON hỏng, thiếu trường, số âm → `null` hoặc 0, không bao giờ throw). Đi theo đúng hợp đồng của `readAutopilotStateForHud` / `readPrdStateForHud`.
+- **Phần tử HUD** `src/hud/elements/vibecodekit-gate.ts` — opt-in, hiển thị release gate ngay trên statusline:
+
+  | Verdict | Định dạng |
+  |---------|-----------|
+  | `SHIP` | `🟢 VK:SHIP 36P` |
+  | `SHIP_WITH_FOLLOWUPS` | `🟡 VK:FOLLOWUPS 2⚠` |
+  | `DO_NOT_SHIP` | `🔴 VK:DO_NOT_SHIP 3❌` |
+
+  Phần tử này **tắt mặc định** (`elements.vibecodekitGate = false / undefined`) nên preset HUD hiện tại không đổi. Bật bằng cách thêm `"vibecodekitGate": true` vào `omcHud.elements` trong `.claude/omc.jsonc`.
+- **CLI `status` bổ sung** — `omc vibecodekit status` giờ thêm dòng `locale_signal` cho biết runtime lấy locale từ tín hiệu nào, khớp đúng với cái HUD thấy.
+- **Test** — 24 unit test mới (9 cho resolver, 7 cho reader, 8 cho HUD element), pass toàn bộ trên Node 20 / vitest.
+
+### Bật HUD element
+
+```jsonc
+// .claude/omc.jsonc
+{
+  "omcHud": {
+    "elements": {
+      "vibecodekitGate": true
+    }
+  }
+}
+```
+
+### Ghi đè locale ở runtime
+
+```bash
+# Ghi đè bền vững cho project (giữ qua nhiều phiên + CI)
+echo '{ "locale": "vi" }' > .omc/locale.json
+
+# Ghi đè tạm cho một shell
+export OMC_LOCALE=vi
+
+# Kiểm tra runtime đang thấy gì
+omc vibecodekit status
+# →   locale_signal    : omc-locale-json (resolved=vi)
+```
+
+## Ngoài phạm vi (để cho phase sau)
+
+Phase 4f dừng ở lớp HUD read-only + locale resolver. Phase sau có thể:
+
+- Publish `.omc/deliverables.json` thành GitHub Check Run (ứng cử 4a).
+- Tách persona bank tiếng Việt thành skill plugin độc lập để preset khác dùng lại.
+- Thêm hook chặn `git push` khi gate là 🔴 (opt-in).
+- Dashboard web hiển thị release gate.
 
 ## Credit
 
-Phỏng theo Vibecodekit v5.0 (Contractor–Worker Protocol) và bộ phương pháp RRI (RRI, RRI-T, RRI-UI, RRI-UX) của Nguyễn (VagabondKingsman). Tích hợp dưới dạng skill-pack, **không** sửa runtime OMC.
+Phỏng theo Vibecodekit v5.0 (Contractor–Worker Protocol) và bộ phương pháp RRI (RRI, RRI-T, RRI-UI, RRI-UX) của Nguyễn (VagabondKingsman). Tích hợp dưới dạng skill-pack qua Phase 1–3; Phase 4f là lần đầu tiên có code TypeScript runtime (và vẫn opt-in).

@@ -20,7 +20,7 @@ describe('Cleanup Validation', () => {
         expect('detectDeprecatedKeywords' in keywordModule).toBe(false);
         expect('DEPRECATED_KEYWORD_PATTERNS' in keywordModule).toBe(false);
     });
-    it('PluginConfig.agents matches 20-agent registry + omc', async () => {
+    it('PluginConfig.agents matches 23-agent registry + omc', async () => {
         const { DEFAULT_CONFIG } = await import('../config/loader.js');
         const agentKeys = Object.keys(DEFAULT_CONFIG.agents || {});
         expect(agentKeys).toContain('omc');
@@ -40,12 +40,15 @@ describe('Cleanup Validation', () => {
         expect(agentKeys).not.toContain('deepExecutor');
         expect(agentKeys).not.toContain('buildFixer');
     });
-    it('agent registry has 20 agents', async () => {
+    it('agent registry has 23 agents', async () => {
         const { getAgentDefinitions } = await import('../agents/definitions.js');
         const defs = getAgentDefinitions();
-        expect(Object.keys(defs)).toHaveLength(20);
+        expect(Object.keys(defs)).toHaveLength(23);
         expect(defs).toHaveProperty('tracer');
         expect(defs).toHaveProperty('rri-interviewer');
+        expect(defs).toHaveProperty('rri-tester');
+        expect(defs).toHaveProperty('rri-ux-critic');
+        expect(defs).toHaveProperty('rri-security-auditor');
     });
 });
 //# sourceMappingURL=cleanup-validation.test.js.map

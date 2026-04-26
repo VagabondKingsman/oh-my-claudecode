@@ -230,6 +230,77 @@ export function readAutopilotStateForHud(directory, sessionId) {
         return null;
     }
 }
+const GATE_GLYPHS = ['🟢', '🟡', '🔴'];
+const RELEASE_DECISIONS = [
+    'SHIP',
+    'SHIP_WITH_FOLLOWUPS',
+    'DO_NOT_SHIP',
+];
+function normaliseGate(raw) {
+    if (typeof raw !== 'string')
+        return null;
+    const trimmed = raw.trim();
+    return GATE_GLYPHS.includes(trimmed)
+        ? trimmed
+        : null;
+}
+function normaliseRelease(raw) {
+    if (typeof raw !== 'string')
+        return null;
+    const trimmed = raw.trim().toUpperCase();
+    return RELEASE_DECISIONS.includes(trimmed)
+        ? trimmed
+        : null;
+}
+function safeNumber(raw) {
+    return typeof raw === 'number' && Number.isFinite(raw) && raw >= 0
+        ? Math.floor(raw)
+        : 0;
+}
+/**
+ * Read the vibecodekit release gate from `.omc/deliverables.json`.
+ *
+ * Returns null when the file is absent, unparseable, or when it contains
+ * no usable gate signal. This matches the behaviour of the other HUD
+ * state readers (ralph, autopilot, prd) — HUD code never throws.
+ */
+export function readVibecodekitGateForHud(directory) {
+    const omcRoot = getOmcRoot(directory);
+    const deliverablesFile = join(omcRoot, 'deliverables.json');
+    if (!existsSync(deliverablesFile)) {
+        return null;
+    }
+    let parsed;
+    try {
+        const content = readFileSync(deliverablesFile, 'utf-8');
+        parsed = JSON.parse(content);
+    }
+    catch {
+        return null;
+    }
+    const verifyGate = normaliseGate(parsed.verify_gate);
+    const releaseDecision = normaliseRelease(parsed.release_decision);
+    // Nothing meaningful to render — bail out.
+    if (!verifyGate && !releaseDecision) {
+        return null;
+    }
+    const vc = parsed.verdict_counts ?? {};
+    return {
+        slug: typeof parsed.slug === 'string' && parsed.slug.trim() ? parsed.slug.trim() : null,
+        verifyGate,
+        releaseDecision,
+        verdictCounts: {
+            pass: safeNumber(vc.pass),
+            fail: safeNumber(vc.fail),
+            painful: safeNumber(vc.painful),
+            missing: safeNumber(vc.missing),
+        },
+        rriTGate: normaliseGate(parsed.rri_t_gate),
+        rriUxGate: normaliseGate(parsed.rri_ux_gate),
+        rriUiGate: normaliseGate(parsed.rri_ui_gate),
+        rriSecGate: normaliseGate(parsed.rri_sec_gate),
+    };
+}
 // ============================================================================
 // Combined State Check
 // ============================================================================

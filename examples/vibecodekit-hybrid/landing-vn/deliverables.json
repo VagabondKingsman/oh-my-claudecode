@@ -1,0 +1,23 @@
+{
+  "slug": "landing-vn",
+  "locale": "vi",
+  "pattern": "landing",
+  "verify_gate": "🟡",
+  "verdict_counts": { "pass": 9, "fail": 0, "painful": 1, "missing": 0 },
+  "release_decision": "SHIP_WITH_FOLLOWUPS",
+  "rri_t_gate": null,
+  "rri_ux_gate": "🟢",
+  "rri_ui_gate": null,
+  "artifact": ".omc/plans/vibecodekit-hybrid-verify-landing-vn.md",
+  "updated_at": "2026-04-24T00:00:00.000Z",
+  "followups": [
+    {
+      "id": "FU-001",
+      "from": "verify",
+      "verdict": "PAINFUL",
+      "summary": "Mobile CTA overlaps virtual keyboard at 375 px after focus on contact input",
+      "owner": "designer",
+      "follow_up_tip": ".omc/plans/tips/landing-vn-fu-001.md"
+    }
+  ]
+}

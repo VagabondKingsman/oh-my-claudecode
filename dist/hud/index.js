@@ -8,7 +8,7 @@
 import { readStdin, writeStdinCache, readStdinCache, getContextPercent, getModelName, stabilizeContextPercent, } from "./stdin.js";
 import { parseTranscript } from "./transcript.js";
 import { readHudState, readHudConfig, getRunningTasks, writeHudState, initializeHUDState, } from "./state.js";
-import { readRalphStateForHud, readUltraworkStateForHud, readPrdStateForHud, readAutopilotStateForHud, } from "./omc-state.js";
+import { readRalphStateForHud, readUltraworkStateForHud, readPrdStateForHud, readAutopilotStateForHud, readVibecodekitGateForHud, } from "./omc-state.js";
 import { getUsage } from "./usage-api.js";
 import { executeCustomProvider } from "./custom-rate-provider.js";
 import { render } from "./render.js";
@@ -233,6 +233,9 @@ async function main(watchMode = false, skipInit = false) {
         const ultrawork = readUltraworkStateForHud(cwd, currentSessionId ?? undefined);
         const prd = readPrdStateForHud(cwd);
         const autopilot = readAutopilotStateForHud(cwd, currentSessionId ?? undefined);
+        const vibecodekitGate = config.elements.vibecodekitGate
+            ? readVibecodekitGateForHud(cwd)
+            : null;
         // Read HUD state for background tasks
         const hudState = readHudState(cwd, currentSessionId ?? undefined);
         const _backgroundTasks = hudState?.backgroundTasks || [];
@@ -329,6 +332,7 @@ async function main(watchMode = false, skipInit = false) {
             ultrawork,
             prd,
             autopilot,
+            vibecodekitGate,
             activeAgents: transcriptData.agents.filter((a) => a.status === "running"),
             todos: transcriptData.todos,
             backgroundTasks: getRunningTasks(hudState),

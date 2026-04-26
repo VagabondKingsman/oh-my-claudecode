@@ -21,6 +21,9 @@ export { qaTesterAgent, QA_TESTER_PROMPT_METADATA } from './qa-tester.js';
 export { scientistAgent, SCIENTIST_PROMPT_METADATA } from './scientist.js';
 export { tracerAgent, TRACER_PROMPT_METADATA } from './tracer.js';
 export { rriInterviewerAgent, RRI_INTERVIEWER_PROMPT_METADATA } from './rri-interviewer.js';
+export { rriTesterAgent, RRI_TESTER_PROMPT_METADATA } from './rri-tester.js';
+export { rriUxCriticAgent, RRI_UX_CRITIC_PROMPT_METADATA } from './rri-ux-critic.js';
+export { rriSecurityAuditorAgent, RRI_SECURITY_AUDITOR_PROMPT_METADATA } from './rri-security-auditor.js';
 export { documentSpecialistAgent, DOCUMENT_SPECIALIST_PROMPT_METADATA } from './document-specialist.js';
 // Reformed agents (Build/Analysis Lane)
 export { debuggerAgent, verifierAgent } from './definitions.js';

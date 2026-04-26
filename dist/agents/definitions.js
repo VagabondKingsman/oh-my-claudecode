@@ -23,6 +23,9 @@ export { scientistAgent } from './scientist.js';
 export { exploreAgent } from './explore.js';
 export { tracerAgent } from './tracer.js';
 export { rriInterviewerAgent } from './rri-interviewer.js';
+export { rriTesterAgent } from './rri-tester.js';
+export { rriUxCriticAgent } from './rri-ux-critic.js';
+export { rriSecurityAuditorAgent } from './rri-security-auditor.js';
 export { documentSpecialistAgent } from './document-specialist.js';
 // Import base agents for use in getAgentDefinitions
 import { architectAgent } from './architect.js';
@@ -37,6 +40,9 @@ import { scientistAgent } from './scientist.js';
 import { exploreAgent } from './explore.js';
 import { tracerAgent } from './tracer.js';
 import { rriInterviewerAgent } from './rri-interviewer.js';
+import { rriTesterAgent } from './rri-tester.js';
+import { rriUxCriticAgent } from './rri-ux-critic.js';
+import { rriSecurityAuditorAgent } from './rri-security-auditor.js';
 import { documentSpecialistAgent } from './document-specialist.js';
 // Re-export loadAgentPrompt (also exported from index.ts)
 export { loadAgentPrompt };
@@ -151,6 +157,9 @@ const AGENT_CONFIG_KEY_MAP = {
     critic: 'critic',
     'document-specialist': 'documentSpecialist',
     'rri-interviewer': 'rriInterviewer',
+    'rri-tester': 'rriTester',
+    'rri-ux-critic': 'rriUxCritic',
+    'rri-security-auditor': 'rriSecurityAuditor',
 };
 function getConfiguredAgentModel(name, config) {
     const key = AGENT_CONFIG_KEY_MAP[name];
@@ -205,6 +214,9 @@ export function getAgentDefinitions(options) {
         'git-master': gitMasterAgent,
         'code-simplifier': codeSimplifierAgent,
         'rri-interviewer': rriInterviewerAgent,
+        'rri-tester': rriTesterAgent,
+        'rri-ux-critic': rriUxCriticAgent,
+        'rri-security-auditor': rriSecurityAuditorAgent,
         // ============================================================
         // COORDINATION
         // ============================================================
@@ -251,7 +263,7 @@ You are BOUND to your task list. You do not stop. You do not quit. You do not ta
 ## Your Core Duty
 You coordinate specialized subagents to accomplish complex software engineering tasks. Abandoning work mid-task is not an option. If you stop without completing ALL tasks, you have failed.
 
-## Available Subagents (19 Agents)
+## Available Subagents (23 Agents)
 
 ### Build/Analysis Lane
 - **explore**: Internal codebase discovery (haiku) — fast pattern matching
@@ -276,6 +288,12 @@ You coordinate specialized subagents to accomplish complex software engineering 
 - **git-master**: Git operations (sonnet) — commits, rebasing, history
 - **document-specialist**: External docs & reference lookup (sonnet) — SDK/API/package research
 - **code-simplifier**: Code clarity (opus) — simplification and maintainability
+
+### Vibecodekit Hybrid Lane
+- **rri-interviewer**: RRI requirements interview (sonnet) — 5 personas × 3 modes (ambiguity-gated Socratic)
+- **rri-tester**: Adversarial QA (sonnet) — 5 testing personas × 7 dims × 8 stress axes, 4-level verdict
+- **rri-ux-critic**: UX critique (sonnet) — 5 UX personas × 7 UX dims × 8 Flow Physics axes
+- **rri-security-auditor**: Security intake (sonnet) — 5 security personas × 8 attack axes (AuthN / AuthZ / Injection / Supply chain / Secret / Data exfil / DoS / Side channel), T→A→V→I→M threat cases, GDPR / PCI-DSS / PDPL / APPI rows
 
 ### Coordination
 - **critic**: Plan review + thorough gap analysis (opus) — critical challenge, multi-perspective investigation, structured "What's Missing" analysis

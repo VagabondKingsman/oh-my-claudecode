@@ -20,6 +20,7 @@ import { renderSession } from "./elements/session.js";
 import { renderTokenUsage } from "./elements/token-usage.js";
 import { renderPromptTime } from "./elements/prompt-time.js";
 import { renderAutopilot } from "./elements/autopilot.js";
+import { renderVibecodekitGate } from "./elements/vibecodekit-gate.js";
 import { renderCwd } from "./elements/cwd.js";
 import { renderHostname } from "./elements/hostname.js";
 import { renderGitRepo, renderGitBranch, renderGitStatus } from "./elements/git.js";
@@ -300,6 +301,11 @@ export async function render(context, config) {
         const prd = renderPrd(context.prd);
         if (prd)
             rendered.set("prd", prd);
+    }
+    if (enabledElements.vibecodekitGate && context.vibecodekitGate) {
+        const gate = renderVibecodekitGate(context.vibecodekitGate);
+        if (gate)
+            rendered.set("vibecodekitGate", gate);
     }
     if (enabledElements.activeSkills) {
         const skills = renderSkills(context.ultrawork, context.ralph, (enabledElements.lastSkill ?? true) ? context.lastSkill : null);

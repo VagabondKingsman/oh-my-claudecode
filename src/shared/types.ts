@@ -40,6 +40,9 @@ export interface PluginConfig {
     critic?: { model?: string };
     documentSpecialist?: { model?: string };
     rriInterviewer?: { model?: string };
+    rriTester?: { model?: string };
+    rriUxCritic?: { model?: string };
+    rriSecurityAuditor?: { model?: string };
   };
 
   // Feature toggles
@@ -437,6 +440,9 @@ export const KNOWN_AGENT_NAMES = [
   'critic',
   'documentSpecialist',
   'rriInterviewer',
+  'rriTester',
+  'rriUxCritic',
+  'rriSecurityAuditor',
 ] as const;
 
 export type KnownAgentName = typeof KNOWN_AGENT_NAMES[number];

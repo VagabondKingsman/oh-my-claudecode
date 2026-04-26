@@ -33,6 +33,7 @@ import { interopCommand } from './interop.js';
 import { askCommand, ASK_USAGE } from './ask.js';
 import { warnIfWin32 } from './win32-warning.js';
 import { autoresearchCommand } from './autoresearch.js';
+import { vibecodekitCommand } from './vibecodekit.js';
 import { runHudWatchLoop } from './hud-watch.js';
 const version = getRuntimePackageVersion();
 /**
@@ -1322,6 +1323,23 @@ program
     .argument('[args...]', 'ralphthon arguments')
     .action(async (args) => {
     await ralphthonCommand(args);
+});
+/**
+ * Vibecodekit command - Manage vibecodekit-hybrid preset artifacts on disk
+ *
+ * Thin CLI surface for scaffolding / inspecting the Contractor-Worker pipeline
+ * artifacts. The actual pipeline runs inside a Claude Code session via the
+ * skill /oh-my-claudecode:vibecodekit-hybrid.
+ */
+program
+    .command('vibecodekit')
+    .description('Manage vibecodekit-hybrid preset artifacts (scaffold / status / patterns)')
+    .helpOption(false)
+    .allowUnknownOption(true)
+    .allowExcessArguments(true)
+    .argument('[args...]', 'vibecodekit subcommand arguments')
+    .action(async (args) => {
+    await vibecodekitCommand(args);
 });
 /**
  * Returns the fully-configured commander program.
